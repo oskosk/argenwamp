@@ -126,7 +126,9 @@
     </div><!--container-->
     <div class="container">
       <section id="descripcion">
-        <h2>Descripción</h2>
+        <div class="page-header">
+          <h2>Descripción</h2>
+        </div>
         <p>
           ArgenWamp es una herramienta open source que te permite visualizar mapas con tus datos
           a partir de una spreadsheet.
@@ -144,132 +146,129 @@
           </div>          
         </div>
       </section>      
-      <div class="row-fluid">
-        <div class="span12">
-        <h2 id="generator">Construí tu mapa<br/>
-        <small>
-          En tu sitio o blog en poco tiempo.
-        </small>
-        </h2>
+      <section id="generator">
+        <div class="page-header">
+          <h2 >Construí tu mapa <small>En tu sitio o blog en poco tiempo.</small></h2>
         </div>
-
-      </div>
-      <hr/>
-
-      <div class="row-fluid">
-        <div class="span4">
-          <h3>Paso 1<br/>
-          <small>
-            Creá una nueva spreadsheet a partir de la plantilla
-          </p>
-          </small>          
-	  </h3>
-        </div><!--span4-->
-        <div class="span8">
-          <p>
-            Creá una nueva spreadsheet usando la plantlla. Es tan simple como completar campos de título, ubicación y URLs en las columnas apropiadas.            
-          </p>
-          <p>
-            <a target="_blank" class="btn btn-primary" href="https://drive.google.com/previewtemplate?id=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&mode=public">Plantilla de Google Spreadsheet &raquo;</a>
-          </p>
-        </div><!--span8-->
-      </div><!--row-fluid-->
-      <hr/>
-      <div class="row-fluid">
-        <div class="span4">
-          <h3>Paso 2<br/>         
-          <small>
-            Publicala en la web
-          </small>
-        </h3>
-        </div><!--span4-->
-        <div class="span8">
-          <div class="row-fluid">
-            <div class="span6">
-              <img src="img/publicarenweb.png" />
-            </div><!--span6-->
-            <div class="span6">
-              <img src="img/codigoembed.png" />
-              <div class="alert alert-block">
-                <h4>¿Cómo se publica una spreadshet?</h4>
-                <ul>
-                  <li>
-                    En el menú Archivo, seleccioná <em>"Publicar en la Web"</em>.
-                  </li>
-                    En la siguiente ventana, tildá la casilla <em>"Volver a publicar automáticamente cuando se realicen los cambios"</em>
-                  </li>
-                  <li>
-                    Destildá todas las demás casillas.
-                  </li>
-                  <li>Hacé click en <em>"Iniciar la publicación"</em>. Al hacer esto, 
-                    te da una URL para incrustar la spreadsheet en tu archivo HTML.
-                  </li>
-                </ul>
-              </div>
-            </div><!--span6-->            
-          </div>
-        </div><!--span8-->
-      </div><!--row-fluid-->      
-      <hr />
-      <div class="row-fluid">
-        <div class="span4">
-          <h3>Paso 3<br/>
+        <div class="row-fluid">
+          <div class="span4">
+            <h3>Paso 1<br/>
             <small>
-            Copiá y pegá la URL en el generador
-          </small>
-          </h3>          
-          <p>
-            Luego agarrá el código para incrustar y copialo en tu sitio en donde quieras que el mapa aparezca (tal cual como
-            harías para incrustar un video de Youtube por ejemplo).
-          </p>
-        </div><!--span4-->
-        <div class="span8">
-          <form class="form-horizontal">
-            <fieldset>
-              <!-- Required elements for embed-->
-              <!-- Embed Source-->
-              <!-- Embed Optional-->
-              <div class="control-group">
-                <label class="control-label"> <a href="https://drive.google.com/previewtemplate?id=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&mode=public" target="_blank">URL de la Google Spreadsheet</a></label>
-                <div class="controls">
-                  <input type="text" id="embed-source-url">
-                  <p class="help-inline">Asegurate de haberla publicado.</p>
+              Creá una nueva spreadsheet a partir de la plantilla
+            </p>
+            </small>          
+  	  </h3>
+          </div><!--span4-->
+          <div class="span8">
+            <p>
+              Creá una nueva spreadsheet usando la plantlla. Es tan simple como completar campos de título, ubicación y URLs en las columnas apropiadas.            
+            </p>
+            <p>
+              <a target="_blank" class="btn btn-primary" href="https://drive.google.com/previewtemplate?id=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&mode=public">Plantilla de Google Spreadsheet &raquo;</a>
+            </p>
+          </div><!--span8-->
+        </div><!--row-fluid-->
+        <hr/>
+        <div class="row-fluid">
+          <div class="span4">
+            <h3>Paso 2<br/>         
+            <small>
+              Publicala en la web
+            </small>
+          </h3>
+          </div><!--span4-->
+          <div class="span8">
+            <div class="row-fluid">
+              <div class="span6">
+                <img src="img/publicarenweb.png" />
+              </div><!--span6-->
+              <div class="span6">
+                <img src="img/codigoembed.png" />
+                <div class="alert alert-block">
+                  <h4>¿Cómo se publica una spreadshet?</h4>
+                  <ul>
+                    <li>
+                      En el menú Archivo, seleccioná <em>"Publicar en la Web"</em>.
+                    </li>
+                      En la siguiente ventana, tildá la casilla <em>"Volver a publicar automáticamente cuando se realicen los cambios"</em>
+                    </li>
+                    <li>
+                      Destildá todas las demás casillas.
+                    </li>
+                    <li>Hacé click en <em>"Iniciar la publicación"</em>. Al hacer esto, 
+                      te da una URL para incrustar la spreadsheet en tu archivo HTML.
+                    </li>
+                  </ul>
                 </div>
-              </div>
-              <!-- Size-->
-              <div class="control-group">
-                <label class="control-label">Tamaño</label>
-                <div class="controls">
-                  <div class="input-prepend"><span class="add-on">Ancho</span>
-                    <input type="text" value="100%" placeholder="100%" id="embed-width" class="input-mini">
+              </div><!--span6-->            
+            </div>
+          </div><!--span8-->
+        </div><!--row-fluid-->      
+        <hr />
+        <div class="row-fluid">
+          <div class="span4">
+            <h3>Paso 3<br/>
+              <small>
+              Copiá y pegá la URL en el generador
+            </small>
+            </h3>          
+            <p>
+              Luego agarrá el código para incrustar y copialo en tu sitio en donde quieras que el mapa aparezca (tal cual como
+              harías para incrustar un video de Youtube por ejemplo).
+            </p>
+          </div><!--span4-->
+          <div class="span8">
+            <form class="form-horizontal">
+              <fieldset>
+                <!-- Required elements for embed-->
+                <!-- Embed Source-->
+                <!-- Embed Optional-->
+                <div class="control-group">
+                  <label class="control-label"> <a href="https://drive.google.com/previewtemplate?id=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&mode=public" target="_blank">URL de la Google Spreadsheet</a></label>
+                  <div class="controls">
+                    <input type="text" id="embed-source-url">
+                    <p class="help-inline">Asegurate de haberla publicado.</p>
                   </div>
-                  <div class="input-prepend"><span class="add-on">Alto</span>
-                    <input type="text" value="500" placeholder="500" id="embed-height" class="input-mini">
+                </div>
+                <!-- Size-->
+                <div class="control-group">
+                  <label class="control-label">Tamaño</label>
+                  <div class="controls">
+                    <div class="input-prepend"><span class="add-on">Ancho</span>
+                      <input type="text" value="100%" placeholder="100%" id="embed-width" class="input-mini">
+                    </div>
+                    <div class="input-prepend"><span class="add-on">Alto</span>
+                      <input type="text" value="500" placeholder="500" id="embed-height" class="input-mini">
+                    </div>
                   </div>
                 </div>
-              </div>
-              <!-- Embed Optional-->
-              <div class="control-group">
-                <label class="control-label"> <strong>Código para incrustar</strong></label>
-                <div class="controls">
-                  <p>Copiá este código y pegalo en donde quieras que tu mapa aparezca.<br>
-                  </p>
-                  <textarea readonly="readonly" style="width: 100%; height: 160px; min-height: 110px; max-height: 300px; resize: none; font-family: Menlo,Monaco,'Courier New',monospace; font-size: 11px;" id="embed-code">
-&lt;iframe src='http://argenwamp.com.ar/iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc;width=600&amp;height=600' width='600' height='600' frameborder='0'&gt;&lt;/iframe&gt;</textarea>
-                  <div style="margin-top:20px;"><a href="#preview-embed" data-scroll="true" id="iframe-preview-button" class="btn btn-primary">Previsualizar</a>&nbsp;<a href="iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc" target="_blank" id="preview-embed-link" >Link a la previsualización</a></div>
+                <!-- Embed Optional-->
+                <div class="control-group">
+                  <label class="control-label"> <strong>Código para incrustar</strong></label>
+                  <div class="controls">
+                    <p>Copiá este código y pegalo en donde quieras que tu mapa aparezca.<br>
+                    </p>
+                    <textarea readonly="readonly" style="width: 100%; height: 160px; min-height: 110px; max-height: 300px; resize: none; font-family: Menlo,Monaco,'Courier New',monospace; font-size: 11px;" id="embed-code">
+  &lt;iframe src='http://argenwamp.com.ar/iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc;width=600&amp;height=600' width='600' height='600' frameborder='0'&gt;&lt;/iframe&gt;</textarea>
+                    <div style="margin-top:20px;"><a href="#preview-embed" data-scroll="true" id="iframe-preview-button" class="btn btn-primary">Previsualizar</a>&nbsp;<a href="iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc" target="_blank" id="preview-embed-link" >Link a la previsualización</a></div>
+                  </div>
                 </div>
-              </div>
-            </fieldset>
-          </form>
-        </div><!--span8-->
-      </div><!--row-fluid-->       
-      <div class="row-fluid" style="display:none" id="preview-embed">
-        <div class="span12" >
+              </fieldset>
+            </form>
+          </div><!--span8-->
+        </div><!--row-fluid-->       
+      </section>
+      <section style="display:none" id="preview-embed">
+        <div class="page-header">
           <h2>Previsualización</h2>
-          <div id="preview">
+        </div>        
+        <div class="row-fluid" >
+          <div class="span12" >
+            <div id="preview">
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
     <footer class="footer">
       <div class="container">
