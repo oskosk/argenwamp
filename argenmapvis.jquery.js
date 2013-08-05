@@ -51,9 +51,8 @@
       var _this = this;
       _this.$el.activity({width:5.5});
       $.when( _this.getDoc() ).done(function() {
-        $.when( _this.parseGDoc() ).done(function() {
           _this.magic();  
-        });
+          _this.$el.activity(false);
       }).fail(function() {
         console.log('source inválido');
         _this.$el.activity(false);
@@ -69,17 +68,26 @@
       var source = _this.opts.source;
 
       var valid_url = ($.url(source ,true).attr('host') !== '');
-      if (! valid_url ) {
         /*
-         * Si source no es una url válida, 
+         * Si source no es una url válida con domain, 
          * asumo que es un id de google docs
          */
+      if (! valid_url ) {
         _this.getGoogleDocsJSON(source, deferred);
       } else {
-        deferred.fail();
+        _this.getJSON(source, deferred);
       }
       
       return deferred.promise();      
+    },
+
+    getJSON: function (source, deferred) {
+      var _this = this;
+      $.get(source, function(data){
+        _this.entries = data;
+        _this.entries = _this._mapFields();
+         _this.parsePlainJSON(deferred);        
+      });
     },
 
     getGoogleDocsJSON: function (google_docs_id, deferred) {
@@ -91,20 +99,22 @@
 
       url = url.replace("{google_docs_id}", google_docs_id);
       if (!google_docs_id ) {
-        console.log('Se necesita el parámetro source en la URL');
         return false;
       }
       $.get(url, function(data){
          _this.entries = data.feed.entry;
-         deferred.resolve(data);
+         //paso el dererred porque el cálculo quizás
+         // es asincrónico porque el usuario puede usar
+         // texto para geocodificar en el campo recurso de la entry texto
+         _this.GDocsJSON2PlainJSON();
+         _this.parsePlainJSON(deferred);
       });
     },
-
-    parseGDoc: function () {
+    
+    GDocsJSON2PlainJSON: function () {
       var _this = this;
-      var deferred = $.Deferred();    
 
-      var field_map = {
+      _this.opts.field_map = {
           titulo: "gsx$titulo",
           capa: "gsx$capa",
           recurso: "gsx$recurso",
@@ -113,22 +123,11 @@
           descripcion: "gsx$descripcion"
       };
 
-      //mapeo del formato de google docs json al json
-      // que necesito (coincide con el mismo que se acepta
-      // si source es una url de un json)
-      _this.entries = $.map(_this.entries, function(entry, i) {
-        return {
-          titulo: entry[field_map.titulo].$t,
-          capa: entry[field_map.capa].$t,
-          recurso: entry[field_map.recurso].$t,
-          tiporecurso: entry[field_map.tiporecurso].$t,
-          zoom: entry[field_map.zoom].$t,
-          descripcion: entry[field_map.descripcion].$t
-        };
+      _this.entries = _this._mapFields(true);
+    },
 
-        _this.$el.data('entries', _this.entries);
-
-      });
+    parsePlainJSON: function(deferred) {
+      var _this = this;
 
       var grupos = _this.entries.groupBy(function(item) {
         return item.tiporecurso;
@@ -147,9 +146,52 @@
             _this.opts.vistaInicial.zoom = grupos.centro[0].zoom;  
           }
           deferred.resolve();
+          return deferred;    
+        });
+      } else {
+        deferred.resolve();
+      }
+      
+    },
+
+    _mapFields: function(is_google_docs_json)
+    {
+      var _this = this;
+      var field_map = _this.opts.field_map;
+      var entries = [];
+      /*
+       * El JSON de un google docs, tiene la propiedad $t
+       * en cada campo que tiene el valor del resultado.
+       * así que lo manejo como un caso especial
+       */
+
+      if (is_google_docs_json) {
+        entries = $.map(_this.entries, function(entry, i) {
+          return {
+            titulo: entry[field_map.titulo].$t,
+            capa: entry[field_map.capa].$t,
+            recurso: entry[field_map.recurso].$t,
+            tiporecurso: entry[field_map.tiporecurso].$t,
+            zoom: entry[field_map.zoom].$t,
+            descripcion: entry[field_map.descripcion].$t
+          };
+        });
+      } else {
+        entries = $.map(_this.entries, function(entry, i) {
+          return {
+            titulo: entry[field_map.titulo],
+            capa: entry[field_map.capa],
+            recurso: entry[field_map.recurso],
+            tiporecurso: entry[field_map.tiporecurso],
+            zoom: entry[field_map.zoom],
+            descripcion: entry[field_map.descripcion]
+          };        
+
+          _this.$el.data('entries', _this.entries);
+
         });
       }
-      return deferred;    
+      return entries;
     },
 
     magic: function () {
