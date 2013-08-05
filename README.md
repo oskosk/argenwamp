@@ -1,4 +1,4 @@
-argenmap.vis
+argenWAMP
 ============
 
-Volcá datos sobre una mapa de argenmap (del Instituto Geográfico Nacional) a partir de una spreadsheet en Google Docs o de un JSON.
+Creá un mapa de Argentina para incrustar en tu sitio a partir de una hoja de cálculo.
