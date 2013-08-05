@@ -64,12 +64,13 @@
   <script type="text/javascript">
     $(document).ready(function() {
       var source = $.url().param('source');
-      if (!source !== undefined) {
+      if (source !== undefined) {
         $('#mapa').argenmapvis({source : source});  
+      } else {
+        console.log('Se necesita el parámetro source en la URL');
       }
       
-
-    })
+    });
 
 
   </script>
