@@ -1,0 +1,129 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>ArgenWamp iframe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <style type="text/css">
+      html,body,.wrapper, #mapa {
+        margin:0;
+        width:100%;
+        height:100%;
+      }
+      // por las dudas. por ejemplo bootstrap
+      // setea max-width:100% y eso mata los controles de gmaps
+      img {
+        max-width:none;
+      }
+      .wrapper {
+          position:relative; /* important(so we can absolutely position the 
+      description div */  
+      }  
+      .wrapper div.description{  
+          position:absolute; /* absolute position (so we can position it where 
+      we want)*/  
+          bottom:0px; /* position will be on bottom */  
+          left:0px;  
+          top:0px;
+          right:0px;
+          display:none; /* hide it */  
+          /* styling bellow */  
+          background-color:black;  
+          font-family: 'tahoma';  
+          font-size:50px;  
+          color:white;  
+      }  
+      .wrapper div.description_content{  
+          padding:10px;  
+      }  
+    </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+
+  <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+  
+  
+  <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+  <script type="text/javascript" src="http://www.ign.gob.ar/argenmap/argenmap.jquery/argenmap.jquery.js"></script>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/sugar/1.3.9/sugar.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-url-parser/2.3.1/purl.min.js"></script>  
+  <script type="text/javascript" src="argenmapvis.jquery.js"></script>    
+  
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.activity-indicator/1.0.0/jquery.activity-indicator.min.js"></script>        
+  
+    
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var source = $.url().param('source');
+      if (!source !== undefined) {
+        $('#mapa').argenmapvis({source : source});  
+      }
+      
+
+    })
+
+
+  </script>
+  <script type="text/javascript" >
+
+
+    function title()
+  {
+   $('div.description').each(function(){  
+        //...set the opacity to 0...  
+        $(this).css('opacity', 0);  
+        //..set width same as the image...  
+        $(this).css('width', $(this).siblings('img').width());  
+        //...get the parent (the wrapper) and set it's width same as the image width... '  
+        $(this).parent().css('width', $(this).siblings('img').width());  
+        //...set the display to block  
+        $(this).css('display', 'block');  
+    });  
+  
+    $('div.wrapper').hover(function(){  
+        //when mouse out of the wrapper div  
+        //use fadeTo to hide the div  
+        $(this).children('.description').stop().fadeTo(500, 0);  
+    },function(){  
+        //when mouse hover over the wrapper div  
+        //get it's children elements with class description '  
+        //and show it using fadeTo  
+        $(this).children('.description').stop().fadeTo(500, 0.7);  
+    });  
+  }
+
+  </script>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div id="mapa">
+      </div>
+      <div class="description">
+        <div class="description_content">
+        Cargando mapa	
+	</div>
+      </div>
+    </div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42952343-1', 'olopez.com.ar');
+  ga('send', 'pageview');
+
+</script>
+  </body>
+
+</html>
