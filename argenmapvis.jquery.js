@@ -50,14 +50,9 @@
     init: function() {
       var _this = this;
       _this.$el.activity({width:5.5});
-      $.when(
-        _this.getDoc()
-      ).done(function() {
-        $.when(
-          _this.parseGDoc()
-        ).done(function() {
+      $.when( _this.getDoc() ).done(function() {
+        $.when( _this.parseGDoc() ).done(function() {
           _this.magic();  
-          
         });
       }).fail(function() {
         console.log('source inválido');
