@@ -75,7 +75,10 @@
 
       var valid_url = ($.url(source ,true).attr('host') !== '');
       if (! valid_url ) {
-        //si no es una url válida, 
+        /*
+         * Si source no es una url válida, 
+         * asumo que es un id de google docs
+         */
         _this.getGoogleDocsJSON(source, deferred);
       } else {
         deferred.fail();
