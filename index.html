@@ -12,10 +12,6 @@
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=News+Cycle:400,700|Merriweather:400,300,700">    
     <style type="text/css">
-      body {
-        background: #ffffff url(img/snow.png) repeat;
-      }
-
       .hero-unit h1 {
         font-family: 'News Cycle',sans-serif;
         text-rendering: optimizelegibility;        
@@ -114,11 +110,13 @@
     <div class="container">
       <section>
         <div class="row-fluid">
-          <div class="span6">
+          <div class="span12">
             <p class="lead">Este mapa...</p>
             <iframe style="width:100%" src='http://argenwamp.com.ar/iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc;width=600&height=600' height='350' frameborder='0'></iframe>                
           </div>
-          <div class="span6">
+        </div>
+        <div class="row-fluid">          
+          <div class="span12">
             <p class="lead">... a partir de esta spreadsheet</p>
             <iframe style="width:100%" src='https://docs.google.com/spreadsheet/pub?key=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&output=html' height='350' frameborder='0'></iframe>                
           </div>
@@ -130,9 +128,12 @@
         <div class="page-header">
           <h2>Descripción</h2>
         </div>
-        <p>
-          ArgenWamp es una herramienta open source que te permite visualizar mapas con tus datos
-          a partir de una spreadsheet.
+        <p class="lead">
+          ArgenWamp es una herramienta open source que te permite construir mapas con datos
+          guardados en una Google Spreadsheet. Podés incrustar el mapa en tu web o compartir el link. 
+        </p>
+         <p>
+            <strong>Este mapa va a estar siempre online</strong> tengas o no servidor porque se basa en la infraestructura de Google Docs.
         </p>
         <div class="row-fluid">
           <div class="span6">
@@ -188,7 +189,7 @@
                   En la siguiente ventana, tildá la casilla <em>"Volver a publicar automáticamente cuando se realicen los cambios"</em>
                 </li>
                 <li>
-                  Destildá todas las demás casillas.
+                  Asegurate de que todas las demás casillas estén destildadas.
                 </li>
                 <li>Hacé click en <em>"Iniciar la publicación"</em>. Al hacer esto, 
                   te da una URL para incrustar la spreadsheet en tu archivo HTML.
