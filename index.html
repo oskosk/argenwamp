@@ -124,14 +124,30 @@
         <div class="page-header">
           <h2>Descripción</h2>
         </div>
+
         <p class="lead">
           ArgenWamp es una herramienta open source que te permite construir mapas con datos
           guardados en una Google Spreadsheet.
         </p>
-         <ul>
-            <li><strong>Este mapa va a estar siempre online</strong> tengas o no servidor porque se basa en la infraestructura de Google Docs.</li>
-            <li>Podés incrustar el mapa en tu web o compartir el link</li>.
-        </ul>
+        <div class="row-fluid">
+          <div class="span6">
+            <ul>
+                <li><strong>Este mapa va a estar siempre online</strong> tengas o no servidor porque se basa en la infraestructura de Google Docs.</li>
+                <li>Podés incrustar el mapa en tu web o compartir el link</li>.
+            </ul>
+          </div><!--span6-->
+          <div class="span6">
+            <p>
+              Puede traer datos de múltiples fuentes y soporta:
+            </p>
+            <ul>
+              <li>Capas WMS</li>
+              <li>Capas KML ya publicadas en la web</li>
+              <li>Marcadores a partir de coordenadas o Geocoding (basado en nominatim de OpenStreetMap).</li>
+            </ul>
+          </div><!--span6-->          
+        </div>
+
         <h3><em>Criteria</em></h3>
         <ul>
           <li>
@@ -162,20 +178,7 @@
             interpreta json. Sea cual sea el origen (Google Docs, una URL de un documento JSON o un objeto javascript)
           </li>
         </ul>
-        <div class="row-fluid">
-          <div class="span6">
-            <p>
-              Puede traer datos de múltiples fuentes y soporta:
-            </p>
-            <ul>
-              <li>Capas WMS</li>
-              <li>Capas KML</li>
-              <li>Marcadores a partir de coordenadas o Geocoding (basado en nominatim de OpenStreetMap).</li>
-            </ul>
-          </div>
-          <div class="span6">
-          </div>          
-        </div>
+
       </section>      
       <section id="generator">
         <div class="page-header">
