@@ -14,7 +14,8 @@
       vistaInicial: {
         lat: -34,
         lng: -59,
-        zoom: undefined
+        zoom: undefined,
+        capa: undefined
       },
         //mapa de campos
         //yo le doy bola solo a titulo capa recurso tiporecurso
@@ -145,6 +146,11 @@
           if (grupos.centro[0].zoom !== undefined) {
             _this.opts.vistaInicial.zoom = grupos.centro[0].zoom;  
           }
+
+          if (grupos.centro[0].capa === 'satelite' ) {
+            _this.opts.vistaInicial.capa = 'satellite';  
+          }
+
           deferred.resolve();
           return deferred;    
         });
@@ -202,6 +208,10 @@
       
       if (_this.opts.vistaInicial.zoom !== undefined) {
         $mapa.zoom( parseInt(_this.opts.vistaInicial.zoom) );      
+      }
+
+      if (_this.opts.vistaInicial.capa !== undefined) {
+        $mapa.capaBase( _this.opts.vistaInicial.capa );      
       }
 
       if (_this.opts.vistaInicial.lat !== undefined) {
