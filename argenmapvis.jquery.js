@@ -260,10 +260,17 @@
         lat: null,
         lng: null
       };
-      if (texto.split(';').length === 2) {
-        latlng.lat = texto.split(';')[0];
-        latlng.lng = texto.split(';')[1];      
+
+      if (_this.parseGeograficas(texto)) {
+        var parsed = _this.parseGeograficas(texto);
+        latlng.lat = parsed.lat.decimal;
+        latlng.lng = parsed.lng.decimal;      
         callback(latlng);
+      } else if ( _this.parseDMS(texto) ) {
+        var parsed = _this.parseDMS(texto);
+        latlng.lat = parsed.lat.decimal;
+        latlng.lng = parsed.lng.decimal;      
+        callback(latlng);        
       } else {
         _this.geoLocate(texto, function(latlng) {
           callback( latlng );
@@ -300,7 +307,138 @@
       boundingbox = new google.maps.LatLngBounds(southwest, northeast);
 
       $mapa.data().gmap.fitBounds( boundingbox);
-    }    
+    },
+
+    parseDMS: function( pair ) {
+      var tmpLat, tmpLng;
+      
+      var coord = {
+        lat: {decimal:0, deg:0, min:0, sec:0},
+        lng: {decimal:0, deg:0, min:0, sec:0}
+      };
+      // patrón que reconoce lat y longitud en grados, min, y segundos
+      // con indicador de sentido de la latitud/longitud (S, N, O, E, o W)
+      var pattern =  /[0-9]{1,3}[º°]{1}([0-9]{1,2}['′´]{1}){0,1}([0-9]{1,2}([.,]{1}[0-9]{1,}){0,1}["″¨]{1}){0,1}[sonew]{1}/gi;
+      var matches = pair.match(pattern);
+      
+      // si no hay matches o se encuentra más de UN
+      // PAR de coordenadas, no lo proceso como válido
+      if (!matches || matches.length > 2 ) {
+        return false;
+      }
+      
+      for (var i=0; i<matches.length;i++) {
+        var decimal,
+          //traigo los grados
+          deg = matches[i].match(/[0-9]{1,3}[º°]{1}/g),
+          //traigo los minutos
+          min = matches[i].match(/[0-9]{1,2}['′´]{1}/g),
+          //traigo los segundos
+          sec = matches[i].match(/[0-9]{1,2}([.,]{1}[0-9]{1,}){0,1}["″¨]{1}/g),
+        
+          // dec(linación)(fruta el nombre de la variable).
+          // Esto marca si la coordenada parseada es latitud sur o norte
+          // o longitud este u oeste.
+          dec = matches[i].match(/[sonew]/gi);
+        dec = dec[0].toLowerCase();
+        
+        // esto es porque quizás las coordenadas
+        // no tienen min o seg
+        deg = $.isArray(deg) ? deg[0] : '';
+        min = $.isArray(min) ? min[0] : '';
+        sec = $.isArray(sec) ? sec[0] : '';
+        
+        deg = parseFloat ( deg.replace(',', '.') ) || 0;
+        min = parseFloat ( min.replace(',', '.') ) || 0;
+        sec = parseFloat ( sec.replace(',', '.') ) || 0;
+          
+        decimal = deg+ (min/60) + (sec/3600);
+          //si es latitud
+        if (dec == "s" || dec == "n" ) {
+          coord.lat.deg = deg;
+          coord.lat.min = min;
+          coord.lat.sec = sec;
+          coord.lat.decimal = decimal
+          // si es latitud negativa
+          if ( dec == "s" ) {
+            coord.lat.decimal *= -1;
+          }
+        }
+          //si es longitud negativa
+        if (dec == "o" || dec == "w" || dec == "e" ) {
+          coord.lng.deg = deg;
+          coord.lng.min = min;
+          coord.lng.sec = sec;          
+          coord.lng.decimal = decimal
+          // si es latitud negativa
+          if ( dec == "o" || dec == "w" ) {
+            coord.lng.decimal *= -1;
+          }
+        }       
+      }
+      return coord;
+    },
+
+    /**
+     * Parsea una cadena de texto en búsqueda
+     * de coordenadas del tipo lat lng. Es decir
+     * solo devuelve las coordenadas parseadas si la cadena contiene
+     * un solo par de coordenadas o una sola coordenada.
+     * 
+     * -El separador decimal es el punto o la coma "." o "," 
+     * -El signo "-" se interpreta como indicador de coordenadsa negativas
+     * -Las coordenadas positivas no deben tener el signo "+" precedente.
+     * Cadenas válidas
+     *  32.12 65.32
+     *  32,12 65,32
+     *  -54.12 65,12 o -54,12 65.12 
+     *  -55.23 o -55,23
+     *  42.23
+     *  
+     *  @param string pair: la cadena de texto con el par de coordenadas
+     *  en formato "lat lng"
+     */
+    parseGeograficas: function(pair) {
+      var tmpLat, tmpLng;
+      
+      var coord = {
+        lat: {decimal:0, deg:0, min:0, sec:0},
+        lng: {decimal:0, deg:0, min:0, sec:0}
+      };
+
+      var pattern =  /-{0,1}[0-9]{1,3}([.,]{1}[0-9]{1,}){0,1}/g;
+      
+      var matches = pair.match(pattern);
+      // si no hay matches o se encuentra más de UN
+      // PAR de coordenadas, no lo proceso como válido
+      if (!matches || matches.length > 2 ) {
+        return false;
+      }
+      //reemplazo las comas por puntos para poder castear bien
+      tmpLat = parseFloat ( matches[0].replace(',', '.') );
+      // Latitud tiene que estar dentro del rango [-90,90]
+      // De lo contrario, directamente devuelvo false
+      // con longitud hago el mismo chequeo pero no devuelvo false
+      // si 
+      if (tmpLat > 90 || tmpLat < -90) {
+        return false;
+      }
+      coord.lat.decimal = tmpLat;
+      if ( matches.length > 1 ) {
+        //reemplazo las comas por puntos para poder castear bien
+        tmpLng = parseFloat ( matches[1].replace(',', '.') );
+        // Longitud tiene que estar dentro del rango [-180,180]
+        // De lo contrario, seteo lng en false;
+        // No vuelvo porque la latitud tiene que estar bien si llegué
+        // a este punto
+        if (tmpLng > 180 || tmpLng < -180) {
+          coord.lng.decimal = undefined;
+        } else {
+          coord.lng.decimal = tmpLng
+        }
+      }
+      return coord;
+    }
 
   };
 
