@@ -9,6 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="shortcut icon" href="img/ico/favicon.png">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=News+Cycle:400,700|Merriweather:400,300,700">
     <style type="text/css">
       html,body,.wrapper, #mapa {
         margin:0;
@@ -20,28 +21,65 @@
       img {
         max-width:none;
       }
-      .wrapper {
-          position:relative; /* important(so we can absolutely position the 
-      description div */  
-      }  
-      .wrapper div.description{  
-          position:absolute; /* absolute position (so we can position it where we want)*/  
-          bottom:0px; /* position will be on bottom */  
-          left:0px;  
-          top:0px;
-          right:0px;
-          display:none; /* hide it */  
-          /* styling bellow */  
-          background-color:black;  
-          font-family: 'tahoma';  
-          font-size:50px;  
-          color:white;  
-      }  
-      .wrapper div.description_content{  
-          padding:10px;  
-      }  
 
+       .barra {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 12px;
+        z-index:110;
+        width:50%;
+        background: url('img/overlay.png') repeat 0 0;
+        color: #FFF;
+      }
 
+      .barra .titulo {
+       
+        display: block;
+        margin: 0 0 6px 0;
+        font-size: 26px;
+        font-weight: bold;
+        line-height: 26px;
+        letter-spacing: -1px;
+      }
+      .barra .descripcion {
+         
+        display: block;
+        color: #EEE;
+        font-size: 12px;
+        line-height: 12px;
+        text-transform: uppercase;
+      }
+
+      .close {
+        float: right;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 20px;
+        color: white;
+        text-shadow: 0 1px 0 #ffffff;
+        opacity: 0.2;
+        filter: alpha(opacity=20);
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000000;
+        text-decoration: none;
+        cursor: pointer;
+        opacity: 0.4;
+        filter: alpha(opacity=40);
+      }
+
+      button.close {
+        margin-top:-10px;
+        margin-right:-5px;
+        padding: 0;
+        cursor: pointer;
+        background: transparent;
+        border: 0;
+        -webkit-appearance: none;
+      }      
     </style>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -58,8 +96,8 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/sugar/1.3.9/sugar.min.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-url-parser/2.3.1/purl.min.js"></script>  
   <script type="text/javascript" src="argenmapvis.jquery.js"></script>    
-  
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.activity-indicator/1.0.0/jquery.activity-indicator.min.js"></script>        
+  <script type="text/javascript" src="http://fgnass.github.io/spin.js/dist/spin.min.js"></script>        
+  <script type="text/javascript" src="http://fgnass.github.io/spin.js/jquery.spin.js"></script>          
   
     
   <script type="text/javascript">
@@ -70,50 +108,24 @@
       } else {
         $('#mapa').html('Se necesita el parámetro source en la URL');
       }
-      
+      $('.close').click(function(){
+        $('.barra').fadeOut();
+      })      
     });
 
 
   </script>
-  <script type="text/javascript" >
 
-
-    function title()
-  {
-   $('div.description').each(function(){  
-        //...set the opacity to 0...  
-        $(this).css('opacity', 0);  
-        //..set width same as the image...  
-        $(this).css('width', $(this).siblings('img').width());  
-        //...get the parent (the wrapper) and set it's width same as the image width... '  
-        $(this).parent().css('width', $(this).siblings('img').width());  
-        //...set the display to block  
-        $(this).css('display', 'block');  
-    });  
-  
-    $('div.wrapper').hover(function(){  
-        //when mouse out of the wrapper div  
-        //use fadeTo to hide the div  
-        $(this).children('.description').stop().fadeTo(500, 0);  
-    },function(){  
-        //when mouse hover over the wrapper div  
-        //get it's children elements with class description '  
-        //and show it using fadeTo  
-        $(this).children('.description').stop().fadeTo(500, 0.7);  
-    });  
-  }
-
-  </script>
   </head>
 
   <body>
     <div class="wrapper">
       <div id="mapa">
-      </div>
-      <div class="description">
-        <div class="description_content">
-        Cargando mapa	
-	</div>
+        <div class="barra" style="display:none">
+          <button class="close" style="float: right;">×</button>
+          <span class="titulo"></span>
+          <span class="descripcion"></span>
+        </div>
       </div>
     </div>
 <script>

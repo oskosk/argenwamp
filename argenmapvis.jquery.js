@@ -31,7 +31,10 @@
         tiporecurso: "tiporecurso",
         zoom: "zoom",
         descripcion: "descripcion"
-      }
+      },
+      barra_class: '.barra',
+      barra_titulo_class: '.titulo',
+      barra_descripcion_class: '.descripcion'
     };
 
     //Extending options:
@@ -150,6 +153,16 @@
           if (grupos.centro[0].capa === 'satelite' ) {
             _this.opts.vistaInicial.capa = 'satellite';  
           }
+
+          if (grupos.centro[0].titulo ) {
+            $(_this.opts.barra_class).show();
+            $(_this.opts.barra_class + ' ' + _this.opts.barra_titulo_class).html(grupos.centro[0].titulo);
+          }          
+
+          if (grupos.centro[0].descripcion ) {
+            $(_this.opts.barra_class).show();
+            $(_this.opts.barra_class + ' ' + _this.opts.barra_descripcion_class).html(grupos.centro[0].descripcion);
+          }          
 
           deferred.resolve();
           return deferred;    
