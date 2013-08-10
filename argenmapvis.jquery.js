@@ -50,13 +50,13 @@
 
     init: function() {
       var _this = this;
-      _this.$el.activity({width:5.5});
+      _this.$el.spin({width:5.5});
       $.when( _this.getDoc() ).done(function() {
           _this.magic();  
-          _this.$el.activity(false);
+          _this.$el.spin(false);
       }).fail(function() {
         console.log('source inválido');
-        _this.$el.activity(false);
+        _this.$el.spin(false);
       });
     },
 
