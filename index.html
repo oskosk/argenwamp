@@ -143,39 +143,39 @@
               <li>Marcadores a partir de coordenadas o Geocoding (basado en nominatim de OpenStreetMap).</li>
             </ul>
           </div><!--span6-->          
-        </div>
-
-        <h3><em>Criteria</em></h3>
-        <ul>
-          <li>
-          Muchas personas están acostumbradas a las planillas de cálculo como estructuras
-          de datos.
-          </li>
-          <li>
-            El código de esta herramienta consume JSON.
-          </li>
-          <li>
-            Google Ofrece por cada documento publicado una url con el documento JSON que representa
-          al documento spreadsheet. Es por eso que esta herramienta sirve para consumir JSON
-          de otra fuente.
-          </li>
-          <li>
-            <strong>Sí, los "datos" quedan guardados en google</strong>. Pero, no hace falta guardar los datos más importantes
-            del mundo en este tipo de mapas.
-          </li>
-          <li>
-             Es una herramienta útil para bocetar mapas a partir de KML o servicios WMS (datos ya publicados conforme a estándares abiertos). 
-           </li>
-          <li>
-            Este proyecto se propone acercar los servicios WMS y los KML ya publicados a quienes no dispongan de mayores habilidades informáticas
-            que el manejo del una planilla de cálculos y una cuenta de Google. 
-          </li>
-          <li>
-            Esta herramienta está construída como 2 html y una plugin de jquery. que
-            interpreta json. Sea cual sea el origen (Google Docs, una URL de un documento JSON o un objeto javascript)
-          </li>
-        </ul>
-
+        </div><!--row-fluid-->
+        <div class="alert">
+          <h3><em>Criteria</em></h3>
+          <ul>
+            <li>
+            Muchas personas están acostumbradas a las planillas de cálculo como estructuras
+            de datos.
+            </li>
+            <li>
+              El código de esta herramienta consume JSON.
+            </li>
+            <li>
+              Google Ofrece por cada documento publicado una url con el documento JSON que representa
+            al documento spreadsheet. Es por eso que esta herramienta sirve para consumir JSON
+            de otra fuente.
+            </li>
+            <li>
+              <strong>Sí, los "datos" quedan guardados en google</strong>. Pero, no hace falta guardar los datos más importantes
+              del mundo en este tipo de mapas.
+            </li>
+            <li>
+               Es una herramienta útil para bocetar mapas a partir de KML o servicios WMS (datos ya publicados conforme a estándares abiertos). 
+             </li>
+            <li>
+              Este proyecto se propone acercar los servicios WMS y los KML ya publicados a quienes no dispongan de mayores habilidades informáticas
+              que el manejo del una planilla de cálculos y una cuenta de Google. 
+            </li>
+            <li>
+              Esta herramienta está construída como 2 html y una plugin de jquery. que
+              interpreta json. Sea cual sea el origen (Google Docs, una URL de un documento JSON o un objeto javascript)
+            </li>
+          </ul>
+        </div><!--alert-->
       </section>      
       <section id="generator">
         <div class="page-header">
@@ -209,7 +209,7 @@
           </h3>
           </div><!--span4-->
           <div class="span8">
-            <div class="alert alert-block">
+            <div class="alert alert-success alert-block">
               <h4>¿Cómo se publica una spreadshet?</h4>
               <ul>
                 <li>
@@ -240,7 +240,7 @@
           <div class="span4">
             <h3>Paso 3<br/>
               <small>
-              Copiá y pegá la URL en el generador
+              Copiá y pegá la URL de tu google spreadsheet pública en el generador
             </small>
             </h3>          
             <p>
@@ -256,7 +256,7 @@
                 <!-- Embed Source-->
                 <!-- Embed Optional-->
                 <div class="control-group">
-                  <label for="embed-source-url" class="control-label">URL de tu Google Spreadsheet</label>
+                  <label for="embed-source-url" class="control-label"><strong>URL de tu Google Spreadsheet</strong></label>
                   <div class="controls">
                     <input type="text" id="embed-source-url">
                     <p class="help-inline"><em>Asegurate de haberla publicado.</em></p>
