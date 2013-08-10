@@ -154,6 +154,10 @@
             _this.opts.vistaInicial.capa = 'satellite';  
           }
 
+          if (grupos.centro[0].capa === 'mapaignbyn' ) {
+            _this.$el.addClass('argenmapvis_byn');
+          }
+
           if (grupos.centro[0].titulo ) {
             $(_this.opts.barra_class).show();
             $(_this.opts.barra_class + ' ' + _this.opts.barra_titulo_class).html(grupos.centro[0].titulo);
