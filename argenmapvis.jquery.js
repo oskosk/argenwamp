@@ -114,7 +114,7 @@
          _this.GDocsJSON2PlainJSON();
          _this.parsePlainJSON(deferred);
       }).fail(function() {
-        _this.alert('La hoja de cálculo no está publicada');
+        _this.alert('La hoja de cálculo no está publicada o no existe.');
       });
     },
     
