@@ -202,7 +202,7 @@
         } catch(e) {
           var url = 'https://docs.google.com/spreadsheet/pub?key={google_docs_id}&output=html';
           url = url.replace('{google_docs_id}', _this.opts.source);
-          var msg = "Falta la línea de encabezados en la <a target='blank' href='{url}' style='color:inherit'>hoja de cálculo</a>";
+          var msg = "Falta la línea de encabezados en la <a target='blank' href='{url}'>hoja de cálculo</a>";
           msg = msg.replace('{url}', url);
           _this.alert(msg);
         }
