@@ -89,8 +89,9 @@
       var _this = this;
       $.get(source, function(data){
         _this.entries = data;
+        
         _this.entries = _this._mapFields();
-         _this.parsePlainJSON(deferred);        
+        _this.parsePlainJSON(deferred);        
       });
     },
 
@@ -112,19 +113,26 @@
          // texto para geocodificar en el campo recurso de la entry texto
          _this.GDocsJSON2PlainJSON();
          _this.parsePlainJSON(deferred);
+      }).fail(function() {
+        _this.alert('La hoja de cálculo no está publicada');
       });
     },
     
     GDocsJSON2PlainJSON: function () {
       var _this = this;
 
+      /*
+       * El JSON de un google docs, tiene la propiedad $t
+       * en cada campo que tiene el valor del resultado.
+       * así que lo manejo como un caso especial
+       */
       _this.opts.field_map = {
-          titulo: "gsx$titulo",
-          capa: "gsx$capa",
-          recurso: "gsx$recurso",
-          tiporecurso: "gsx$tiporecurso",
-          zoom: "gsx$zoom",
-          descripcion: "gsx$descripcion"
+          titulo: "gsx$titulo.$t",
+          capa: "gsx$capa.$t",
+          recurso: "gsx$recurso.$t",
+          tiporecurso: "gsx$tiporecurso.$t",
+          zoom: "gsx$zoom.$t",
+          descripcion: "gsx$descripcion.$t"
       };
 
       _this.entries = _this._mapFields(true);
@@ -182,38 +190,40 @@
       var _this = this;
       var field_map = _this.opts.field_map;
       var entries = [];
-      /*
-       * El JSON de un google docs, tiene la propiedad $t
-       * en cada campo que tiene el valor del resultado.
-       * así que lo manejo como un caso especial
-       */
 
-      if (is_google_docs_json) {
-        entries = $.map(_this.entries, function(entry, i) {
-          return {
-            titulo: entry[field_map.titulo].$t,
-            capa: entry[field_map.capa].$t,
-            recurso: entry[field_map.recurso].$t,
-            tiporecurso: entry[field_map.tiporecurso].$t,
-            zoom: entry[field_map.zoom].$t,
-            descripcion: entry[field_map.descripcion].$t
-          };
+      entries = $.map(_this.entries, function(entry, i) {
+        var mapped={};
+
+        
+        try {
+          // Esto puede tirar error
+          // si en la spreadsheet no están los encabezados
+          mapped = magic_map(entry);
+        } catch(e) {
+          var url = 'https://docs.google.com/spreadsheet/pub?key={google_docs_id}&output=html';
+          url = url.replace('{google_docs_id}', _this.opts.source);
+          var msg = "Falta la línea de encabezados en la <a target='blank' href='{url}' style='color:inherit'>hoja de cálculo</a>";
+          msg = msg.replace('{url}', url);
+          _this.alert(msg);
+        }
+        return mapped;
+      }); // fin del $.map
+      
+      function magic_map(entry)
+      {
+        var ret = {};
+        $.each(field_map, function(name, real_name) {
+          var tmp = entry;
+          var partes = real_name.split('.');
+          $(partes).each(function() {
+            tmp = tmp[this];
+          })
+          ret[name] = tmp;
+
         });
-      } else {
-        entries = $.map(_this.entries, function(entry, i) {
-          return {
-            titulo: entry[field_map.titulo],
-            capa: entry[field_map.capa],
-            recurso: entry[field_map.recurso],
-            tiporecurso: entry[field_map.tiporecurso],
-            zoom: entry[field_map.zoom],
-            descripcion: entry[field_map.descripcion]
-          };        
-
-          _this.$el.data('entries', _this.entries);
-
-        });
+        return ret;
       }
+
       return entries;
     },
 
@@ -269,6 +279,13 @@
           url: 'http://mapa.ign.gob.ar/mapa/proxy/?url=' + encodeURIComponent(kml.recurso)
         });
       })
+    },
+
+    alert: function (msg) {
+      var _this = this;
+      $(_this.opts.barra_class).fadeIn();
+      $(_this.opts.barra_class + ' ' + _this.opts.barra_titulo_class).html("argenWAMP - Error en el mapa");
+      $(_this.opts.barra_class + ' ' + _this.opts.barra_descripcion_class).html(msg);
     },
 
     parseCoordenadas: function  (texto, callback, context) {
