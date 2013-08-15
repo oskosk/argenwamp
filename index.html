@@ -128,7 +128,7 @@
       <section>
         <div class="row-fluid">
           <div class="span12">
-            <p >Este mapa, a partir de <a target="_blank" href="https://drive.google.com/previewtemplate?id=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&mode=public">esta spreadsheet.</a>
+            <p >Este mapa, a partir de <a target="_blank" href="https://docs.google.com/spreadsheet/pub?key=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&output=html">esta spreadsheet.</a>
       </p>
             <iframe title="mapa creado con argenwamp" style="width:100%;border:1px dashed #ccc" src='iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc;width=600&height=600' height='350' frameborder='0'></iframe>                
           </div>
@@ -406,6 +406,7 @@
       $(document).ready(function() {
 
         acronyms();
+        //otrasapps();
 
         $('#create-form').submit(function() {
           var id = '';
@@ -477,6 +478,14 @@
 			
 		}      
       
+    function otrasapps()
+    {
+      var projects = 'http://programar.hackdash.org/api/projects';
+      $.getJSON('http://mapa.ign.gob.ar/mapa/proxy?url='+encodeURIComponent(projects), function(data) {
+
+        console.log(data);
+      });
+    }
     </script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
