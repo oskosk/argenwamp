@@ -11,6 +11,15 @@
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=News+Cycle:400,700|Merriweather:400,300,700">    
     <link rel="shortcut icon" href="img/ico/favicon.png">
     <style type="text/css">
+      .navbar-inverse .navbar-inner {
+        background: #404040;
+        color: inherit;
+        background: rgba(0,0,0,0.7);
+      }
+
+      body {
+        padding-top:41px;
+      }
       .hero-unit {
         padding: 5px;
       }
@@ -28,6 +37,10 @@
       }
       .alert {
         border: 1px solid #c09853;
+      }
+
+      section {
+        padding-top: 40px;
       }
       span.Vis  {
         color: #FFF;
@@ -94,15 +107,25 @@
 
   <body>
     <div class="container-fluid">
-      <div class="masthead">
-        <ul class="nav  nav-pills pull-right">
-          <li class="active"><a href="#descripcion">Descripción</a></li>
-          <li><a href="#generator">Armá tu mapa</a></li>
-          <li><a href="#ejemplos">Ejemplos</a></li>            
-        </ul>
+      <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse pull-right">
+            <ul class="nav">
+              <li ><a href="#descripcion">Descripción</a></li>
+              <li class="active"><a href="#generator" style="font-weight:bold;color:white;background-color:#111111">Armá tu mapa</a></li>
+              <li><a href="#ejemplos">Ejemplos</a></li>   
+            </ul>
+          </div>
+        </div>
       </div>
-    </div>
-      <div class="alert text-center" >
+    </div>      
+      <div class="alert text-center" style="margin-top:20px">
         Esta aplicación es 100% funcional y es muy estable. Lee <a href="#what_sorcery_is_this">Cómo funciona ArgenWAMP</a> para la justificación de esto.
       </div>    
     <header class="hero-unit" style="color:inherit;background-color:white;border-top:1px solid #ccc;border-bottom:1px solid #ccc;">
