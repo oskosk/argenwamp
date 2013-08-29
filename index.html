@@ -119,7 +119,9 @@
             <ul class="nav">
               <li ><a href="#descripcion">Descripción</a></li>
               <li class="active"><a href="#generator" style="font-weight:bold;color:white;background-color:#111111">Armá tu mapa</a></li>
+              <li><a href="#comoseusa">Cómo se usa</a></li>   
               <li><a href="#ejemplos">Ejemplos</a></li>   
+              <li><a href="#otrasappsdelhackaton">Otras apps</a></li>                 
             </ul>
           </div>
         </div>
@@ -377,25 +379,25 @@
           <h2>Previsualización</h2>
         </div>       
 
-    <div class="row-fluid">
-      <div class="span12">
-        <!-- Place this tag where you want the share button to render. -->
-        <div style="float:right">
-          <div class="g-plus" data-action="share" data-width="200" data-height="24"></div>
+        <div class="row-fluid">
+          <div class="span12">
+            <!-- Place this tag where you want the share button to render. -->
+            <div style="float:right">
+              <div class="g-plus" data-action="share" data-width="200" data-height="24"></div>
 
-          <!-- Place this tag after the last share tag. -->
-          <script type="text/javascript">
-            window.___gcfg = {lang: 'es-419'};
+              <!-- Place this tag after the last share tag. -->
+              <script type="text/javascript">
+                window.___gcfg = {lang: 'es-419'};
 
-            (function() {
-              var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-              po.src = 'https://apis.google.com/js/plusone.js';
-              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-            })();
-          </script>
-        </div>
-      </div>
-    </div>         
+                (function() {
+                  var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+                  po.src = 'https://apis.google.com/js/plusone.js';
+                  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+                })();
+              </script>
+            </div>
+          </div>
+        </div>         
         <div class="row-fluid" >
           <div class="span12" >
             <div id="preview">
@@ -403,6 +405,80 @@
           </div>
         </div>
       </section>
+      <section id="comoseusa">
+        <div class="page-header">
+          <h2>Cómo se usa argenWAMP</h2>
+        </div>
+        <p>
+          ArgenWAMP permite definir un mapa completando celdas en la hoja de cálculo.
+        </p>
+        <p>
+          Esta es la descripción acerca de cómo completar las columnas
+          de la hoja de cálculo para generar un mapa.
+        </p>
+        <div class="row-fluid" >
+          <div class="span12">
+            <p>
+              <strong>Columna Tipo_recurso</strong>
+            </p>
+            <p>
+              Los valores posibles son:
+            </p>            
+            <dl>
+              <dt><code>centro</code></dt>
+                <dd>define a esta fila como un descriptor de la vista inicial del mapa.</dd>
+              <dt><code>kml</code></dt>
+                <dd>define a esta fila como un descriptor de una URL de un KML.</dd>              
+              <dt><code>marcador</code></dt>
+                <dd>define que a esta fila va describir un punto geográfico sobre el mapa.</dd>                            
+              <dt><code>wms</code></dt>
+                <dd>define a esta fila como un descriptor de una capa de datos en un servicio de mapas WMS.</dd>                                            
+            <p>
+              <strong>Columna Titulo</strong>
+            </p>
+            <p>
+              Este campo sólo sirve para las filas del tipo <code>marcador</code> y <code>centro</code>.
+            </p>            
+            <dl>
+              <dt>En la fila de tipo <code>centro</code></dt>
+                <dd>Define el título del mapa. Esto aparece sobre un rectángulo translucido.</dd>
+              <dt>En las filas de tipo <code>marcador</code></dt>
+                <dd>Define la etiqueta de un marcador, que se ve al ponel el mouse soebre el marcador sin clickear y el título
+                  de que aparecerá en el globito que presenta la información de la columna <code>Descripcion</code> al hacer click sobre el marcador.</dd>                            
+            </dl>
+            <p>
+              <strong>Columna Recurso</strong>
+            </p>
+            <p>
+              Este campo es la parte importante de cada fila. Acepta un par de coordenadas o un texto
+              que argenWAMP intentará geocodificar.
+            </p>  
+            <dl>
+              <dt>En la fila de tipo <code>centro</code></dt>
+                <dd>Define el centro inicial  del mapa.</dd>
+              <dt>En las filas de tipo <code>marcador</code></dt>
+                <dd>Define la posición geográfica del punto que el marcador representa.</dd>                            
+              <dt>En las filas de tipo <code>KML</code></dt>
+                <dd>Define la URL del KML que queremos superponer sobre el  mapa.</dd> 
+              <dt>En las filas de tipo <code>WMS</code></dt>
+                <dd>Define la URL base del servicios WMS. <strong>No la URL del capabilities</strong>.</dd>
+            </dl>
+            <p>
+              <strong>Columna Capa</strong>
+            </p>
+            <p>
+              El nombre de esta columna sólo tiene sentido para las filas de tipo <code>WMS</code> y <code>marcador</code>.
+            </p>  
+            <dl>
+              <dt>En la fila de tipo <code>WMS</code></dt>
+                <dd>Define qué capas queremos del servicios WMS. Este texto se pasa directamente como parámetro<code>LAYERS</code> al servicio WMS, es decir podés especificar más de una capa separa por comas, sin dejar espacios.</dd>
+              <dt>En las filas de tipo <code>marcador</code></dt>
+                <dd>Define la la URL de un ícono para utilizar como marcador. Debería ser un png que esté online en culquier URL. No hace falta que vos publiques el ícono si ya tenés la URL de un PNG que esté online.</dd>
+            </dl>
+
+          </div><!--span-->
+        </div><!--row-fluid-->
+      </section>       
       <section id="ejemplos">
         <div class="page-header">
           <h2>Ejemplos</h2>
@@ -439,7 +515,18 @@
             </li>              
           </ul>
         </div>
-      </section>      
+      </section> 
+      <section  id="otrasappsdelhackaton">
+        <div class="page-header">
+          <h2>Otras apps <small>presentadas en el Hackatón Program.Ar</h2>
+        </div>       
+
+        <div class="row-fluid">
+          <div id="otrasapps" class="span12">
+
+          </div>
+        </div> 
+      </section>           
     </div>
     <footer class="footer">
       <div class="container">
@@ -455,13 +542,13 @@
       $(document).ready(function() {
 
         acronyms();
-        //otrasapps();
+        otrasapps();
 
         $('#create-form').submit(function() {
           var id = '';
           var google_docs_url = $('#embed-source-url').val();
 
-            console.log(google_docs_url);
+            //console.log(google_docs_url);
           var iframe = "&lt;iframe src='{url_embed}?source={source}&amp;' width='{width}' height='{height}' frameborder='0'&gt;&lt;/iframe&gt;";
           var url_embed = 'http://argenwamp.com.ar/iframe.html';
           if ( google_docs_url) {
@@ -530,9 +617,25 @@
     function otrasapps()
     {
       var projects = 'http://programar.hackdash.org/api/projects';
-      $.getJSON('http://mapa.ign.gob.ar/mapa/proxy?url='+encodeURIComponent(projects), function(data) {
+      $.getJSON('hackdashapi-programar-projects.json', function(data) {
+          var $html = $(data.html);
+	  $html.find('img').attr('src', '');
+          $html.find('img').remove();
+          $ul = $('<ul />');
+          $('#otrasapps').html($ul);
+          $html.each(function() {
+            var title = $(this).find('h3').html();
+            if (title == 'ArgenWamp') {
+              return;
+            }
+            var href = 'http://programar.hackdash.org/p/' + $(this).attr('data-id');
 
-        console.log(data);
+            var $li = $('<li />').appendTo($ul);
+            $('<a target="_blank" />').attr('href', href).appendTo($li).html(title);
+            
+            
+
+          });
       });
     }
     </script>
