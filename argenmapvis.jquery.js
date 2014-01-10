@@ -45,6 +45,7 @@
     this.$el = $(el);
     this.entries = [];
     this.marcadores = [];
+    this.marcadores_parsed = []
     this.wms = [];
     this.kml = [];
     this.controlDiv = null;
@@ -268,9 +269,11 @@
         });
       });
 
-      var marcadores_por_grupo = _this.marcadores.groupBy(function(item) {
-        return item.grupo;
-      });
+      if (_this.marcadores ) {
+        var marcadores_por_grupo = _this.marcadores.groupBy(function(item) {
+          return item.grupo;
+        });
+      }
 
       {
         var vistas = [
@@ -339,14 +342,21 @@
         var $contenido = $('<div />');
         $("<h3 />").html(marcador.titulo).appendTo($contenido);
         $("<div />").html(marcador.descripcion).appendTo($contenido);
-
-        $mapa.agregarMarcador({
+        // var argenmap = $mapa.data('argenmap');
+        // var tmp = argenmap.agregarMarcador;
+        // argenmap.agregarMarcador = function(opciones) {
+        //   console.log( "Night train!");
+        //   tmp(opciones);
+        // }
+        var _marcador = {
           nombre: marcador.titulo,
           icono: marcador.capa,
           lat: latlng.lat,
           lng: latlng.lng,
           contenido: $contenido.html(),
-        });
+        };
+        _this.marcadores_parsed.push( _marcador );
+        $mapa.agregarMarcador( _marcador );
       
       });
     },
@@ -425,7 +435,20 @@
           }
         })
         $grupoUI.append( $input );
-        $grupoUI.append('<strong>' + nombreDelGrupo + '</strong>');
+        $a = $('<a href="#"></a>').text(nombreDelGrupo);
+        var latlngbounds = new google.maps.LatLngBounds();
+        $(marcadores_por_grupo[nombreDelGrupo]).each(function(i, v) {
+           _this.parseCoordenadas(v.recurso, function(latlng) {
+              latlngbounds.extend(new google.maps.LatLng(latlng.lat, latlng.lng));
+           });
+        });
+        $a.click(function() {
+          $mapa.data('gmap').setCenter(latlngbounds.getCenter());
+          $mapa.data('gmap').fitBounds(latlngbounds);           
+          
+        });
+        $grupoUI.append($a);
+
         return $grupoUI;
       }
 
@@ -433,9 +456,13 @@
       $controlText.click(function() {
         $gruposUI.toggle();
 
-      }).on("mouseout", function() {
-        console.log('a');
       });
+
+      // $controlDiv.on("mouseleave", function() {
+      //   window.setTimeout(function() {
+      //     $gruposUI.hide();
+      //   }, 2000);
+      // });
       return $controlDiv.get(0);
     },
 
@@ -518,6 +545,14 @@
       $controlText.click(function() {
         $vistasUI.toggle();
       });
+
+
+      // $vistasUI.on("mouseleave", function() {
+      //   window.setTimeout(function() {
+      //     $vistasUI.hide();
+      //   }, 1000);
+      // });
+
       return $controlDiv.get(0);
     },
     alert: function (msg) {
