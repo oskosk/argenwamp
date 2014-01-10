@@ -426,13 +426,27 @@
             </p>            
             <dl>
               <dt><code>centro</code></dt>
-                <dd>define a esta fila como un descriptor de la vista inicial del mapa.</dd>
+                <dd>define a esta fila como un descriptor de la vista inicial del mapa.
+                  <iframe style="width:100%;padding:0;overflow:hidden;height:120px;" frameborder=0 src="https://spreadsheets.google.com/tq?tqx=out:html&tq=select%20*%20LIMIT%201%20OFFSET%200&key=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&gid=0"></iframe>
+                </dd>
               <dt><code>kml</code></dt>
-                <dd>define a esta fila como un descriptor de una URL de un KML.</dd>              
+                <dd>define a esta fila como un descriptor de una URL de un KML.
+                  <iframe style="width:100%;padding:0;overflow:hidden;height:120px;" frameborder=0 src="https://spreadsheets.google.com/tq?tqx=out:html&tq=select%20*%20LIMIT%201%20OFFSET%206&key=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&gid=0"></iframe>
+                </dd>              
               <dt><code>marcador</code></dt>
-                <dd>define que a esta fila va describir un punto geográfico sobre el mapa.</dd>                            
+                <dd>define que a esta fila va describir un punto geográfico sobre el mapa.
+                  <iframe style="width:100%;padding:0;overflow:hidden;height:120px;" frameborder=0 src="https://spreadsheets.google.com/tq?tqx=out:html&tq=select%20*%20LIMIT%201%20OFFSET%204&key=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&gid=0"></iframe>
+                </dd>                            
               <dt><code>wms</code></dt>
-                <dd>define a esta fila como un descriptor de una capa de datos en un servicio de mapas WMS.</dd>                                            
+                <dd>define a esta fila como un descriptor de una capa de datos en un servicio de mapas WMS.
+                  <iframe style="width:100%;padding:0;overflow:hidden;height:120px;" frameborder=0 src="https://spreadsheets.google.com/tq?tqx=out:html&tq=select%20*%20LIMIT%201%20OFFSET%207&key=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&gid=0"></iframe>
+                </dd>                                            
+              <dt><code>cluster_de_marcadores</code></dt>
+                <dd>Esta fila habilita el <em>clustering</em> de marcadores. En caso de tener muchos marcadores, 
+                  esta función permite que se muestren agrupaciones de marcadores resumidas en un ícono que indica
+                   la cantidad de marcadores en la zona resumida. <strong>Para deshabilitar esta funcionalidad, simplemente borrá esta fila y se mostrarán todos los marcadores sin ser agrupados</strong>.
+                  <iframe style="width:100%;padding:0;overflow:hidden;height:120px;" frameborder=0 src="https://spreadsheets.google.com/tq?tqx=out:html&tq=select%20*%20LIMIT%201%20OFFSET%201&key=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc&gid=0"></iframe>
+                </dd>                                                            
             <p>
               <strong>Columna Titulo</strong>
             </p>
@@ -475,6 +489,17 @@
               <dt>En las filas de tipo <code>marcador</code></dt>
                 <dd>Define la la URL de un ícono para utilizar como marcador. Debería ser un png que esté online en culquier URL. No hace falta que vos publiques el ícono si ya tenés la URL de un PNG que esté online.</dd>
             </dl>
+            <p>
+              <strong>Columna Grupo</strong>
+            </p>
+            <p>
+              El valor de esta columna sólo tiene sentido para las filas de tipo <code>marcador</code>.
+            </p>  
+            <p>
+              Los marcadores se agruparán en grupos según esta columna. Al cargar, por ejemplo 15 marcadores (filas del tipo <code>marcador</code>),
+              y especificar "hospital" en la columna <code>grupo</code> de 10 de ellos y luego "comisaría" en la columna <code>grupo</code>los otros 5,
+              el mapa mostrará un selector de grupos en el cual se pueden ocultar o mostrar los distintos grupos de marcadores.
+            </p>
 
           </div><!--span-->
         </div><!--row-fluid-->
