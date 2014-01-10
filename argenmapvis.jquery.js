@@ -385,6 +385,7 @@
         this._marcadores[opciones.nombre] = m;
 
         _this.markerCluster.addMarker( m, true );
+        _this.markerCluster.redraw();
 
         
 
@@ -397,7 +398,18 @@
         });
 
         return;
-      }
+      };
+
+          /**
+       * Quita un marcador del mapa basado en el nombre
+       **/
+      argenmap.quitarMarcador = function (nombre) {
+        if (this._marcadores[nombre] !== undefined) {
+          this.markerCluster.removeMarker(this._marcadores[nombre]);
+          this._marcadores[nombre].setMap(null);
+          delete this._marcadores[nombre];
+        }
+      };
     },
 
     agregarMarcador: function(marcador) {
