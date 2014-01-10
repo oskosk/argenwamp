@@ -30,7 +30,8 @@
         recurso: "recurso",
         tiporecurso: "tiporecurso",
         zoom: "zoom",
-        descripcion: "descripcion"
+        descripcion: "descripcion",
+        grupo: "grupo"
       },
       barra_class: '.barra',
       barra_titulo_class: '.titulo',
@@ -42,10 +43,13 @@
 
     //Privates:
     this.$el = $(el);
+    this.recursos = [];
     this.entries = [];
     this.marcadores = [];
+    this.marcadores_parsed = []
     this.wms = [];
     this.kml = [];
+    this.controlDiv = null;
   }
 
   // Separate functionality from object creation
@@ -132,7 +136,8 @@
           recurso: "gsx$recurso.$t",
           tiporecurso: "gsx$tiporecurso.$t",
           zoom: "gsx$zoom.$t",
-          descripcion: "gsx$descripcion.$t"
+          descripcion: "gsx$descripcion.$t",
+          grupo: "gsx$grupo.$t"
       };
 
       _this.entries = _this._mapFields(true);
@@ -141,39 +146,41 @@
     parsePlainJSON: function(deferred) {
       var _this = this;
 
-      var grupos = _this.entries.groupBy(function(item) {
+      var recursos = _this.entries.groupBy(function(item) {
         return item.tiporecurso;
       });
 
-      _this.wms = grupos.wms;
-      _this.marcadores = grupos.marcador;
-      _this.kml = grupos.kml;
+      _this.recursos = recursos;
+      _this.wms = recursos.wms;
+      _this.marcadores = recursos.marcador;
+      _this.kml = recursos.kml;
 
-      if (grupos.centro !== undefined) {
-        _this.parseCoordenadas(grupos.centro[0].recurso, function(latlng) {
+
+      if (recursos.centro !== undefined) {
+        _this.parseCoordenadas(recursos.centro[0].recurso, function(latlng) {
           _this.opts.vistaInicial.lat = latlng.lat;
           _this.opts.vistaInicial.lng = latlng.lng;
 
-          if (grupos.centro[0].zoom !== undefined) {
-            _this.opts.vistaInicial.zoom = grupos.centro[0].zoom;  
+          if (recursos.centro[0].zoom !== undefined) {
+            _this.opts.vistaInicial.zoom = recursos.centro[0].zoom;  
           }
 
-          if (grupos.centro[0].capa === 'satelite' ) {
+          if (recursos.centro[0].capa === 'satelite' ) {
             _this.opts.vistaInicial.capa = 'satellite';  
           }
 
-          if (grupos.centro[0].capa === 'mapaignbyn' ) {
+          if (recursos.centro[0].capa === 'mapaignbyn' ) {
             _this.$el.addClass('argenmapvis_byn');
           }
 
-          if (grupos.centro[0].titulo ) {
+          if (recursos.centro[0].titulo ) {
             $(_this.opts.barra_class).show();
-            $(_this.opts.barra_class + ' ' + _this.opts.barra_titulo_class).html(grupos.centro[0].titulo);
+            $(_this.opts.barra_class + ' ' + _this.opts.barra_titulo_class).html(recursos.centro[0].titulo);
           }          
 
-          if (grupos.centro[0].descripcion ) {
+          if (recursos.centro[0].descripcion ) {
             $(_this.opts.barra_class).show();
-            $(_this.opts.barra_class + ' ' + _this.opts.barra_descripcion_class).html(grupos.centro[0].descripcion);
+            $(_this.opts.barra_class + ' ' + _this.opts.barra_descripcion_class).html(recursos.centro[0].descripcion);
           }          
 
           deferred.resolve();
@@ -194,17 +201,12 @@
       entries = $.map(_this.entries, function(entry, i) {
         var mapped={};
 
-        
         try {
           // Esto puede tirar error
           // si en la spreadsheet no están los encabezados
           mapped = magic_map(entry);
         } catch(e) {
-          var url = 'https://docs.google.com/spreadsheet/pub?key={google_docs_id}&output=html';
-          url = url.replace('{google_docs_id}', _this.opts.source);
-          var msg = "Falta la línea de encabezados en la <a target='blank' href='{url}'>hoja de cálculo</a>";
-          msg = msg.replace('{url}', url);
-          _this.alert(msg);
+
         }
         return mapped;
       }); // fin del $.map
@@ -215,10 +217,22 @@
         $.each(field_map, function(name, real_name) {
           var tmp = entry;
           var partes = real_name.split('.');
-          $(partes).each(function() {
-            tmp = tmp[this];
-          })
-          ret[name] = tmp;
+          try {
+            $(partes).each(function() {
+              tmp = tmp[this];
+            });
+            ret[name] = tmp;
+            
+          } catch(e) {
+            if (name != 'grupo') {
+              var url = 'https://docs.google.com/spreadsheet/pub?key={google_docs_id}&output=html';
+              url = url.replace('{google_docs_id}', _this.opts.source);
+              var msg = "Falta la línea de encabezados en la <a target='blank' href='{url}'>hoja de cálculo</a>";
+              msg = msg.replace('{url}', url);
+              _this.alert(msg);            
+            }
+            //tirar error del try de arriba si faltan encabezados esencials, no como la columna 'grupo' 
+          }
 
         });
         return ret;
@@ -232,6 +246,14 @@
 
       $mapa = _this.$el;
       $mapa.argenmap();
+
+      if (_this.recursos.cluster_de_marcadores !== undefined) {
+        _this.habilitarClustering();
+      }
+
+      var map = $mapa.data().gmap;
+      
+
       
       if (_this.opts.vistaInicial.zoom !== undefined) {
         $mapa.zoom( parseInt(_this.opts.vistaInicial.zoom) );      
@@ -253,24 +275,61 @@
         });
       });
 
-      $(_this.marcadores).each(function(k, marcador) {
-        _this.parseCoordenadas(marcador.recurso, function(latlng) {
-          if (! latlng.lat ) {
-            return;
-          }
-          var $contenido = $('<div />');
-          $("<h3 />").html(marcador.titulo).appendTo($contenido);
-          $("<div />").html(marcador.descripcion).appendTo($contenido);
-
-          $mapa.agregarMarcador({
-            nombre: marcador.titulo,
-            icono: marcador.capa,
-            lat: latlng.lat,
-            lng: latlng.lng,
-            contenido: $contenido.html(),
-          });
-        
+      if (_this.marcadores ) {
+        var marcadores_por_grupo = _this.marcadores.groupBy(function(item) {
+          return item.grupo;
         });
+      }
+
+      {
+        var vistas = [
+          {lat: _this.opts.vistaInicial.lat, lng:_this.opts.vistaInicial.lng , zoom: parseInt(_this.opts.vistaInicial.zoom), nombre: "[ Vista inicial ]"},
+          {lat: -34.000000, lng: -59, zoom: 3, nombre: "[ Todas ]"},
+          {lat: -34.608345, lng: -58.438683, zoom: 13, nombre: "Ciudad Autónoma de Buenos Aires"},
+          {lat: -37.201728, lng: -59.84107, zoom: 7, nombre: "Buenos Aires"},
+          {lat: -27.076391, lng: -66.998801, zoom: 8, nombre: "Catamarca"},
+          {lat: -26.585766, lng: -60.954007, zoom: 8, nombre: "Chaco"},
+          {lat: -43.684619, lng: -69.274554, zoom: 7, nombre: "Chubut"},
+          {lat: -32.29684, lng: -63.580611, zoom: 8, nombre: "Córdoba"},
+          {lat: -28.58416, lng: -58.007192, zoom: 8, nombre: "Corrientes"},
+          {lat: -32.517564, lng: -59.104176, zoom: 8, nombre: "Entre Ríos"},
+          {lat: -24.657002, lng: -60.216064, zoom: 8, nombre: "Formosa"},
+          {lat: -22.663321, lng: -66.236717, zoom: 8, nombre: "Jujuy"},
+          {lat: -37.03764, lng: -65.687256, zoom: 8, nombre: "La Pampa"},
+          {lat: -29.900172, lng: -66.998801, zoom: 8, nombre: "La Rioja"},
+          {lat: -34.586903, lng: -68.143141, zoom: 8, nombre: "Mendoza"},
+          {lat: -26.652368, lng: -54.805298, zoom: 9, nombre: "Misiones"},
+          {lat: -38.823384, lng: -69.669119, zoom: 8, nombre: "Neuquén"},
+          {lat: -40.530502, lng: -67.664795, zoom: 7, nombre: "Río Negro"},
+          {lat: -25.252954, lng: -64.716241, zoom: 8, nombre: "Salta"},
+          {lat: -30.872459, lng: -68.524715, zoom: 8, nombre: "San Juan"},
+          {lat: -33.876902, lng: -66.236717, zoom: 8, nombre: "San Luis"},
+          {lat: -49.853465, lng: -70.092773, zoom: 7, nombre: "Santa Cruz"},
+          {lat: -30.244153, lng: -60.582068, zoom: 7, nombre: "Santa Fe"},
+          {lat: -27.858504, lng: -63.336182, zoom: 8, nombre: "Santiago del Estero"},
+          {lat: -26.946846, lng: -65.285708, zoom: 9, nombre: "Tucumán"},
+          {lat: -54.308355, lng: -67.745156, zoom: 8, nombre: "Tierra del Fuego"},          
+          {lat: -65.654726, lng: -60.021728, zoom: 5, nombre: "Antártida"},
+          {lat: -51.7, lng: -57.85, zoom: 8, nombre: "Islas Malvinas"},
+          {lat: -57.75, lng: -26.5, zoom: 7, nombre: "Islas Sandwich del Sur"},
+          {lat: -54.43333, lng:-36.55, zoom: 7, nombre: "Islas Georgias del Sur"}
+        ];        
+        this.controlDeVista = _this.ControlDeVista('Seleccione una provincia', vistas);
+        map.controls[google.maps.ControlPosition.RIGHT_TOP].push(this.controlDeVista);
+      }
+
+      if (_this.marcadores &&  marcadores_por_grupo[undefined] === undefined) {
+        this.controlDiv = _this.ControlDeGrupos('Marcadores', marcadores_por_grupo);
+    
+        // Add the control to the map at a designated control position
+        // by pushing it on the position's array. This code will
+        // implicitly add the control to the DOM, through the Map
+        // object. You should not attach the control manually.
+        map.controls[google.maps.ControlPosition.RIGHT_TOP].push(this.controlDiv);
+      }
+
+      $(_this.marcadores).each(function(k, marcador) {
+        _this.agregarMarcador(marcador);
 
       });
       $(_this.kml).each(function(k, kml) {
@@ -281,6 +340,299 @@
       })
     },
 
+    habilitarClustering: function() {
+      var _this = this;
+      var $mapa  = _this.$el;
+      var argenmap = $mapa.data('argenmap');
+      if (argenmap.markerCluster === undefined) {
+        argenmap.markerCluster = new MarkerClusterer( $mapa.data('gmap'), undefined, {
+          maxZoom:16
+        });
+      }
+      argenmap.agregarMarcador = function(opciones) {
+        var _this = this,
+          defaults = {
+            lat: _this.gmap.getCenter().lat(),
+            lng: _this.gmap.getCenter().lng(),
+            icono: argenmap.BASEURL + 'img/marcadores/punto.png',
+            nombre: 'Marcador_' + Math.floor(Math.random() * 10100),
+            contenido: undefined
+          };
+        opciones = $.extend({}, defaults, opciones);
+
+
+        //compatibilidad entre lng, lon y long
+        if(opciones.hasOwnProperty("long")) {
+          //long es un reserved de JS, closure no puede manejarlo
+          opciones.lng = opciones['long'];
+        }else if(opciones.hasOwnProperty("lon")) {
+          opciones.lng = opciones.lon;
+        }else if(opciones.hasOwnProperty("lat") && typeof(opciones.lat) === "function"){
+          //el argument es un google.maps.LatLng
+          opciones.lat = opciones.lat();
+          opciones.lng = opciones.lng();
+        }
+
+        var marker = {};
+        marker.icon = opciones.icono;
+        marker.data = opciones.contenido;
+        marker.position = new google.maps.LatLng(opciones.lat, opciones.lng);
+        marker.title = opciones.nombre;
+        //marker.map = _this.gmap;
+
+        var m = new google.maps.Marker(marker);
+
+        this._marcadores[opciones.nombre] = m;
+
+        _this.markerCluster.addMarker( m, true );
+        _this.markerCluster.redraw();
+
+        
+
+        google.maps.event.addListener(m, 'click', function () {
+          if (!opciones.contenido) {
+            return;
+          }
+          _this.infoWindow().open(_this.$el.data('gmap'), m);
+          _this.infoWindow().setContent(opciones.contenido);
+        });
+
+        return;
+      };
+
+          /**
+       * Quita un marcador del mapa basado en el nombre
+       **/
+      argenmap.quitarMarcador = function (nombre) {
+        if (this._marcadores[nombre] !== undefined) {
+          this.markerCluster.removeMarker(this._marcadores[nombre]);
+          this._marcadores[nombre].setMap(null);
+          delete this._marcadores[nombre];
+        }
+      };
+    },
+
+    agregarMarcador: function(marcador) {
+      var _this = this;
+      _this.parseCoordenadas(marcador.recurso, function(latlng) {
+        if (! latlng.lat ) {
+          return;
+        }
+        var $contenido = $('<div />');
+        $("<h3 />").html(marcador.titulo).appendTo($contenido);
+        $("<div />").html(marcador.descripcion).appendTo($contenido);
+        
+
+
+        var _marcador = {
+          nombre: marcador.titulo,
+          icono: marcador.capa,
+          lat: latlng.lat,
+          lng: latlng.lng,
+          contenido: $contenido.html(),
+        };
+        _this.marcadores_parsed.push( _marcador );
+        $mapa.agregarMarcador( _marcador );
+      
+      });
+    },
+    /**
+     * Crea un div con un control que permite ocultar marcadores
+     * de a grupos. Los grupos están definidos
+     * en la propiedad 'grupo' de cada marcador.
+     */
+    ControlDeGrupos: function (titulo, marcadores_por_grupo) {
+      var _this = this;
+      var grupos = [];
+      for (x in marcadores_por_grupo) {
+        grupos.push(x)
+      }
+      var $controlDiv = $('<div />');
+      // We don't really need to set an index value here, but
+      // this would be how you do it. Note that we set this
+      // value as a property of the DIV itself.
+      $controlDiv.get(0).index = 2;
+      
+      // Set CSS styles for the DIV containing the control
+      // Setting padding to 5 px will offset the control
+      // from the edge of the map.
+      $controlDiv.css('padding', '5px');
+
+      // Set CSS for the control border.
+      var $controlUI = $('<div />').css({
+        '-webkit-user-select': 'none',
+        'padding': '1px 0px',
+        'background-color': 'white',
+        'border': '1px solid rgba(0, 0, 0, 0.14902)',
+        'cursor': 'pointer',
+        'text-align': 'center'
+      })
+      .appendTo( $controlDiv );
+
+
+      // Set CSS for the control interior.
+      var $controlText = $('<div />').css({
+        'color': '#000',
+        'font-family': 'Roboto,Arial, sans-serif',
+        'font-weight': 500,
+        'font-size': '11px',
+        'padding-left': '4px',
+        'padding-right': '4px'
+      }).html( titulo )
+      .attr('title', 'Grupos de marcadores')
+      .appendTo( $controlUI );
+
+      $('<img src="http://maps.gstatic.com/mapfiles/arrow-down.png" draggable="false" style="position:relative;-webkit-user-select: none; border: 0px; padding: 0px; margin: -2px 0px 0px 10px; right: 6px; top: 50%; width: 7px; height: 4px;">')
+      .appendTo($controlText);
+
+      var $gruposUI = $('<div />').css({
+        'text-align': 'left'
+      });
+
+      $(grupos).each(function() {
+        $gruposUI.append( grupo(this) )
+          .appendTo( $controlUI ).hide();
+      })
+
+      function grupo(nombreDelGrupo) {
+        var $grupoUI = $('<div />');
+        var $input = $('<input checked="checked" type="checkbox"/>');
+        $input.data('grupo', nombreDelGrupo)
+        $input.click(function() {
+          if ( $(this).is(':checked')) {
+            var grupo = $(this).data('grupo');
+            $(marcadores_por_grupo[grupo]).each(function() {
+              _this.agregarMarcador(this);
+            });            
+          } else {
+            var grupo = $(this).data('grupo');
+            $(marcadores_por_grupo[grupo]).each(function() {
+              $mapa.quitarMarcador(this.titulo);
+            });
+          }
+        })
+        $grupoUI.append( $input );
+        $a = $('<a href="#"></a>').text(nombreDelGrupo);
+        var latlngbounds = new google.maps.LatLngBounds();
+        $(marcadores_por_grupo[nombreDelGrupo]).each(function(i, v) {
+           _this.parseCoordenadas(v.recurso, function(latlng) {
+              latlngbounds.extend(new google.maps.LatLng(latlng.lat, latlng.lng));
+           });
+        });
+        $a.click(function() {
+          $mapa.data('gmap').setCenter(latlngbounds.getCenter());
+          $mapa.data('gmap').fitBounds(latlngbounds);           
+          
+        });
+        $grupoUI.append($a);
+
+        return $grupoUI;
+      }
+
+      // Setup the click event listeners: simply set the map to Chicago.
+      $controlText.click(function() {
+        $gruposUI.toggle();
+
+      });
+
+      // $controlDiv.on("mouseleave", function() {
+      //   window.setTimeout(function() {
+      //     $gruposUI.hide();
+      //   }, 2000);
+      // });
+      return $controlDiv.get(0);
+    },
+
+    /**
+     * Crea un div con un control que permite seleccionar
+     * una vista predeterminada por provincias y por país.
+     * Una vista está definida por un centro y una vista predeterminadas.
+     */
+    ControlDeVista: function (titulo, vistas) {
+      var _this = this;
+
+      var $controlDiv = $('<div/>');
+      // We don't really need to set an index value here, but
+      // this would be how you do it. Note that we set this
+      // value as a property of the DIV itself.
+      $controlDiv.get(0).index = 1;
+      
+      // Set CSS styles for the DIV containing the control
+      // Setting padding to 5 px will offset the control
+      // from the edge of the map.
+      $controlDiv.css({
+        'padding': '5px',
+        'z-index': '2'
+      });
+
+      // Set CSS for the control border.
+      var $controlUI = $('<div />').css({
+        '-webkit-user-select': 'none',
+        'padding': '1px 0px',
+        'background-color': 'white',
+        'border': '1px solid rgba(0, 0, 0, 0.14902)',
+        'cursor': 'pointer',
+        'text-align': 'center'
+      })
+      .appendTo( $controlDiv );
+
+
+      // Set CSS for the control interior.
+      var $controlText = $('<div />').css({
+        'color': '#000',
+        'font-family': 'Roboto, Arial, sans-serif',
+        'font-weight': 500,
+        'font-size': '11px',        
+        'padding-left': '4px',
+        'padding-right': '4px'
+      }).html( titulo )
+      .attr('title', 'Vistas a nivel de Provincia')
+      .appendTo( $controlUI );
+
+      $('<img src="http://maps.gstatic.com/mapfiles/arrow-down.png" draggable="false" style="position:relative;-webkit-user-select: none; border: 0px; padding: 0px; margin: -2px 0px 0px 10px; right: 6px; top: 50%; width: 7px; height: 4px;">')
+      .appendTo($controlText);
+
+      var $vistasUI = $('<select />').css({
+        'text-align': 'left'
+      });
+
+      var $optgroup = $('<optgroup label="Tierra del Fuego, Antártida e Islas del Atlántico Sur"></optgroup>');
+      $(vistas).each(function(i, v) {
+        var $option = $('<option></option');
+        $option.text(v.nombre);
+        $option.val(v.nombre);
+        $option.data('vista', v);
+        if (i >= 24 ) {
+          $optgroup.append( $option );
+          $vistasUI.append( $optgroup );
+        } else {
+          $vistasUI.append( $option );
+        }
+        $vistasUI.appendTo( $controlUI ).hide();
+      })
+
+      $vistasUI.change(function() {
+        var $option = $(this).find('option:selected'),
+          vista = $option.data().vista,
+          $mapa = _this.$el; 
+        $mapa.zoom(vista.zoom);
+        $mapa.centro(vista.lat, vista.lng);
+      });
+
+      // Setup the click event listeners: simply set the map to Chicago.
+      $controlText.click(function() {
+        $vistasUI.toggle();
+      });
+
+
+      // $vistasUI.on("mouseleave", function() {
+      //   window.setTimeout(function() {
+      //     $vistasUI.hide();
+      //   }, 1000);
+      // });
+
+      return $controlDiv.get(0);
+    },
     alert: function (msg) {
       var _this = this;
       $(_this.opts.barra_class).fadeIn();
