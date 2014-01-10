@@ -43,6 +43,7 @@
 
     //Privates:
     this.$el = $(el);
+    this.recursos = [];
     this.entries = [];
     this.marcadores = [];
     this.marcadores_parsed = []
@@ -149,9 +150,11 @@
         return item.tiporecurso;
       });
 
+      _this.recursos = recursos;
       _this.wms = recursos.wms;
       _this.marcadores = recursos.marcador;
       _this.kml = recursos.kml;
+
 
       if (recursos.centro !== undefined) {
         _this.parseCoordenadas(recursos.centro[0].recurso, function(latlng) {
@@ -244,6 +247,9 @@
       $mapa = _this.$el;
       $mapa.argenmap();
 
+      if (_this.recursos.cluster_de_marcadores !== undefined) {
+        _this.habilitarClustering();
+      }
 
       var map = $mapa.data().gmap;
       
@@ -277,6 +283,7 @@
 
       {
         var vistas = [
+          {lat: _this.opts.vistaInicial.lat, lng:_this.opts.vistaInicial.lng , zoom: parseInt(_this.opts.vistaInicial.zoom), nombre: "[ Vista inicial ]"},
           {lat: -34.000000, lng: -59, zoom: 3, nombre: "[ Todas ]"},
           {lat: -34.608345, lng: -58.438683, zoom: 13, nombre: "Ciudad Autónoma de Buenos Aires"},
           {lat: -37.201728, lng: -59.84107, zoom: 7, nombre: "Buenos Aires"},
@@ -333,6 +340,66 @@
       })
     },
 
+    habilitarClustering: function() {
+      var _this = this;
+      var $mapa  = _this.$el;
+      var argenmap = $mapa.data('argenmap');
+      if (argenmap.markerCluster === undefined) {
+        argenmap.markerCluster = new MarkerClusterer( $mapa.data('gmap'), undefined, {
+          maxZoom:16
+        });
+      }
+      argenmap.agregarMarcador = function(opciones) {
+        var _this = this,
+          defaults = {
+            lat: _this.gmap.getCenter().lat(),
+            lng: _this.gmap.getCenter().lng(),
+            icono: argenmap.BASEURL + 'img/marcadores/punto.png',
+            nombre: 'Marcador_' + Math.floor(Math.random() * 10100),
+            contenido: undefined
+          };
+        opciones = $.extend({}, defaults, opciones);
+
+
+        //compatibilidad entre lng, lon y long
+        if(opciones.hasOwnProperty("long")) {
+          //long es un reserved de JS, closure no puede manejarlo
+          opciones.lng = opciones['long'];
+        }else if(opciones.hasOwnProperty("lon")) {
+          opciones.lng = opciones.lon;
+        }else if(opciones.hasOwnProperty("lat") && typeof(opciones.lat) === "function"){
+          //el argument es un google.maps.LatLng
+          opciones.lat = opciones.lat();
+          opciones.lng = opciones.lng();
+        }
+
+        var marker = {};
+        marker.icon = opciones.icono;
+        marker.data = opciones.contenido;
+        marker.position = new google.maps.LatLng(opciones.lat, opciones.lng);
+        marker.title = opciones.nombre;
+        //marker.map = _this.gmap;
+
+        var m = new google.maps.Marker(marker);
+
+        this._marcadores[opciones.nombre] = m;
+
+        _this.markerCluster.addMarker( m, true );
+
+        
+
+        google.maps.event.addListener(m, 'click', function () {
+          if (!opciones.contenido) {
+            return;
+          }
+          _this.infoWindow().open(_this.$el.data('gmap'), m);
+          _this.infoWindow().setContent(opciones.contenido);
+        });
+
+        return;
+      }
+    },
+
     agregarMarcador: function(marcador) {
       var _this = this;
       _this.parseCoordenadas(marcador.recurso, function(latlng) {
@@ -342,66 +409,9 @@
         var $contenido = $('<div />');
         $("<h3 />").html(marcador.titulo).appendTo($contenido);
         $("<div />").html(marcador.descripcion).appendTo($contenido);
-        var argenmap = $mapa.data('argenmap');
-
-        if (argenmap.markerCluster === undefined) {
-          argenmap.markerCluster = new MarkerClusterer( $mapa.data('gmap'), undefined, {
-            maxZoom:16
-          });
-        }
-        argenmap.agregarMarcador = function(opciones) {
-          var _this = this,
-            defaults = {
-              lat: _this.gmap.getCenter().lat(),
-              lng: _this.gmap.getCenter().lng(),
-              icono: argenmap.BASEURL + 'img/marcadores/punto.png',
-              nombre: 'Marcador_' + Math.floor(Math.random() * 10100),
-              contenido: undefined
-            };
-          opciones = $.extend({}, defaults, opciones);
+        
 
 
-          //compatibilidad entre lng, lon y long
-          if(opciones.hasOwnProperty("long")) {
-            //long es un reserved de JS, closure no puede manejarlo
-            opciones.lng = opciones['long'];
-          }else if(opciones.hasOwnProperty("lon")) {
-            opciones.lng = opciones.lon;
-          }else if(opciones.hasOwnProperty("lat") && typeof(opciones.lat) === "function"){
-            //el argument es un google.maps.LatLng
-            opciones.lat = opciones.lat();
-            opciones.lng = opciones.lng();
-          }
-
-          var marker = {};
-          marker.icon = opciones.icono;
-          marker.data = opciones.contenido;
-          marker.position = new google.maps.LatLng(opciones.lat, opciones.lng);
-          marker.title = opciones.nombre;
-          //marker.map = _this.gmap;
-
-          var m = new google.maps.Marker(marker);
-
-          this._marcadores[opciones.nombre] = m;
-          if (window.sota !== undefined ) {
-            sota.push(m);
-          } else {
-            sota = [];
-          }
-          _this.markerCluster.addMarker( m, true );
-
-          
-
-          google.maps.event.addListener(m, 'click', function () {
-            if (!opciones.contenido) {
-              return;
-            }
-            _this.infoWindow().open(_this.$el.data('gmap'), m);
-            _this.infoWindow().setContent(opciones.contenido);
-          });
-
-          return;
-        }
         var _marcador = {
           nombre: marcador.titulo,
           icono: marcador.capa,
@@ -450,9 +460,10 @@
 
       // Set CSS for the control interior.
       var $controlText = $('<div />').css({
-        'font-family': 'Arial, sans-serif',
+        'color': '#000',
+        'font-family': 'Roboto,Arial, sans-serif',
         'font-weight': 500,
-        'font-size': '12px',
+        'font-size': '11px',
         'padding-left': '4px',
         'padding-right': '4px'
       }).html( titulo )
@@ -556,9 +567,10 @@
 
       // Set CSS for the control interior.
       var $controlText = $('<div />').css({
-        'font-family': 'Arial, sans-serif',
+        'color': '#000',
+        'font-family': 'Roboto, Arial, sans-serif',
         'font-weight': 500,
-        'font-size': '12px',        
+        'font-size': '11px',        
         'padding-left': '4px',
         'padding-right': '4px'
       }).html( titulo )
