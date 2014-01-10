@@ -272,6 +272,42 @@
         return item.grupo;
       });
 
+      {
+        var vistas = [
+          {lat: -34.000000, lng: -59, zoom: 3, nombre: "[ Todas ]"},
+          {lat: -34.608345, lng: -58.438683, zoom: 13, nombre: "Ciudad Autónoma de Buenos Aires"},
+          {lat: -37.201728, lng: -59.84107, zoom: 7, nombre: "Buenos Aires"},
+          {lat: -27.076391, lng: -66.998801, zoom: 8, nombre: "Catamarca"},
+          {lat: -26.585766, lng: -60.954007, zoom: 8, nombre: "Chaco"},
+          {lat: -43.684619, lng: -69.274554, zoom: 7, nombre: "Chubut"},
+          {lat: -32.29684, lng: -63.580611, zoom: 8, nombre: "Córdoba"},
+          {lat: -28.58416, lng: -58.007192, zoom: 8, nombre: "Corrientes"},
+          {lat: -32.517564, lng: -59.104176, zoom: 8, nombre: "Entre Ríos"},
+          {lat: -24.657002, lng: -60.216064, zoom: 8, nombre: "Formosa"},
+          {lat: -22.663321, lng: -66.236717, zoom: 8, nombre: "Jujuy"},
+          {lat: -37.03764, lng: -65.687256, zoom: 8, nombre: "La Pampa"},
+          {lat: -29.900172, lng: -66.998801, zoom: 8, nombre: "La Rioja"},
+          {lat: -34.586903, lng: -68.143141, zoom: 8, nombre: "Mendoza"},
+          {lat: -26.652368, lng: -54.805298, zoom: 9, nombre: "Misiones"},
+          {lat: -38.823384, lng: -69.669119, zoom: 8, nombre: "Neuquén"},
+          {lat: -40.530502, lng: -67.664795, zoom: 7, nombre: "Río Negro"},
+          {lat: -25.252954, lng: -64.716241, zoom: 8, nombre: "Salta"},
+          {lat: -30.872459, lng: -68.524715, zoom: 8, nombre: "San Juan"},
+          {lat: -33.876902, lng: -66.236717, zoom: 8, nombre: "San Luis"},
+          {lat: -49.853465, lng: -70.092773, zoom: 7, nombre: "Santa Cruz"},
+          {lat: -30.244153, lng: -60.582068, zoom: 7, nombre: "Santa Fe"},
+          {lat: -27.858504, lng: -63.336182, zoom: 8, nombre: "Santiago del Estero"},
+          {lat: -26.946846, lng: -65.285708, zoom: 9, nombre: "Tucumán"},
+          {lat: -54.308355, lng: -67.745156, zoom: 8, nombre: "Tierra del Fuego"},          
+          {lat: -65.654726, lng: -60.021728, zoom: 5, nombre: "Antártida"},
+          {lat: -51.7, lng: -57.85, zoom: 8, nombre: "Islas Malvinas"},
+          {lat: -57.75, lng: -26.5, zoom: 7, nombre: "Islas Sandwich del Sur"},
+          {lat: -54.43333, lng:-36.55, zoom: 7, nombre: "Islas Georgias del Sur"}
+        ];        
+        this.controlDeVista = _this.ControlDeVista('Seleccione una provincia', vistas);
+        map.controls[google.maps.ControlPosition.RIGHT_TOP].push(this.controlDeVista);
+      }
+
       if (_this.marcadores &&  marcadores_por_grupo[undefined] === undefined) {
         this.controlDiv = _this.ControlDeGrupos('Marcadores', marcadores_por_grupo);
     
@@ -315,9 +351,9 @@
       });
     },
     /**
-     * The HomeControl adds a control to the map that simply
-     * returns the user to Chicago. This constructor takes
-     * the control DIV as an argument.
+     * Crea un div con un control que permite ocultar marcadores
+     * de a grupos. Los grupos están definidos
+     * en la propiedad 'grupo' de cada marcador.
      */
     ControlDeGrupos: function (titulo, marcadores_por_grupo) {
       var _this = this;
@@ -325,36 +361,38 @@
       for (x in marcadores_por_grupo) {
         grupos.push(x)
       }
-      var controlDiv = document.createElement('div');
+      var $controlDiv = $('<div />');
       // We don't really need to set an index value here, but
       // this would be how you do it. Note that we set this
       // value as a property of the DIV itself.
-      controlDiv.index = 1;
+      $controlDiv.get(0).index = 2;
       
       // Set CSS styles for the DIV containing the control
       // Setting padding to 5 px will offset the control
       // from the edge of the map.
-      $(controlDiv).css('padding', '5px');
+      $controlDiv.css('padding', '5px');
 
       // Set CSS for the control border.
       var $controlUI = $('<div />').css({
+        '-webkit-user-select': 'none',
         'padding': '1px 0px',
         'background-color': 'white',
         'border': '1px solid rgba(0, 0, 0, 0.14902)',
         'cursor': 'pointer',
         'text-align': 'center'
       })
-      .appendTo( $(controlDiv) );
+      .appendTo( $controlDiv );
 
 
       // Set CSS for the control interior.
       var $controlText = $('<div />').css({
         'font-family': 'Arial, sans-serif',
+        'font-weight': 500,
         'font-size': '12px',
         'padding-left': '4px',
         'padding-right': '4px'
       }).html( titulo )
-      .attr('title', 'Click para ver los grupos de marcadores')
+      .attr('title', 'Grupos de marcadores')
       .appendTo( $controlUI );
 
       $('<img src="http://maps.gstatic.com/mapfiles/arrow-down.png" draggable="false" style="position:relative;-webkit-user-select: none; border: 0px; padding: 0px; margin: -2px 0px 0px 10px; right: 6px; top: 50%; width: 7px; height: 4px;">')
@@ -395,10 +433,93 @@
       $controlText.click(function() {
         $gruposUI.toggle();
 
+      }).on("mouseout", function() {
+        console.log('a');
       });
-      return controlDiv;
+      return $controlDiv.get(0);
     },
 
+    /**
+     * Crea un div con un control que permite seleccionar
+     * una vista predeterminada por provincias y por país.
+     * Una vista está definida por un centro y una vista predeterminadas.
+     */
+    ControlDeVista: function (titulo, vistas) {
+      var _this = this;
+
+      var $controlDiv = $('<div/>');
+      // We don't really need to set an index value here, but
+      // this would be how you do it. Note that we set this
+      // value as a property of the DIV itself.
+      $controlDiv.get(0).index = 1;
+      
+      // Set CSS styles for the DIV containing the control
+      // Setting padding to 5 px will offset the control
+      // from the edge of the map.
+      $controlDiv.css({
+        'padding': '5px',
+        'z-index': '2'
+      });
+
+      // Set CSS for the control border.
+      var $controlUI = $('<div />').css({
+        '-webkit-user-select': 'none',
+        'padding': '1px 0px',
+        'background-color': 'white',
+        'border': '1px solid rgba(0, 0, 0, 0.14902)',
+        'cursor': 'pointer',
+        'text-align': 'center'
+      })
+      .appendTo( $controlDiv );
+
+
+      // Set CSS for the control interior.
+      var $controlText = $('<div />').css({
+        'font-family': 'Arial, sans-serif',
+        'font-weight': 500,
+        'font-size': '12px',        
+        'padding-left': '4px',
+        'padding-right': '4px'
+      }).html( titulo )
+      .attr('title', 'Vistas a nivel de Provincia')
+      .appendTo( $controlUI );
+
+      $('<img src="http://maps.gstatic.com/mapfiles/arrow-down.png" draggable="false" style="position:relative;-webkit-user-select: none; border: 0px; padding: 0px; margin: -2px 0px 0px 10px; right: 6px; top: 50%; width: 7px; height: 4px;">')
+      .appendTo($controlText);
+
+      var $vistasUI = $('<select />').css({
+        'text-align': 'left'
+      });
+
+      var $optgroup = $('<optgroup label="Tierra del Fuego, Antártida e Islas del Atlántico Sur"></optgroup>');
+      $(vistas).each(function(i, v) {
+        var $option = $('<option></option');
+        $option.text(v.nombre);
+        $option.val(v.nombre);
+        $option.data('vista', v);
+        if (i >= 24 ) {
+          $optgroup.append( $option );
+          $vistasUI.append( $optgroup );
+        } else {
+          $vistasUI.append( $option );
+        }
+        $vistasUI.appendTo( $controlUI ).hide();
+      })
+
+      $vistasUI.change(function() {
+        var $option = $(this).find('option:selected'),
+          vista = $option.data().vista,
+          $mapa = _this.$el; 
+        $mapa.zoom(vista.zoom);
+        $mapa.centro(vista.lat, vista.lng);
+      });
+
+      // Setup the click event listeners: simply set the map to Chicago.
+      $controlText.click(function() {
+        $vistasUI.toggle();
+      });
+      return $controlDiv.get(0);
+    },
     alert: function (msg) {
       var _this = this;
       $(_this.opts.barra_class).fadeIn();
