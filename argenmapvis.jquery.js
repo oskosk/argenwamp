@@ -342,12 +342,66 @@
         var $contenido = $('<div />');
         $("<h3 />").html(marcador.titulo).appendTo($contenido);
         $("<div />").html(marcador.descripcion).appendTo($contenido);
-        // var argenmap = $mapa.data('argenmap');
-        // var tmp = argenmap.agregarMarcador;
-        // argenmap.agregarMarcador = function(opciones) {
-        //   console.log( "Night train!");
-        //   tmp(opciones);
-        // }
+        var argenmap = $mapa.data('argenmap');
+
+        if (argenmap.markerCluster === undefined) {
+          argenmap.markerCluster = new MarkerClusterer( $mapa.data('gmap'), undefined, {
+            maxZoom:16
+          });
+        }
+        argenmap.agregarMarcador = function(opciones) {
+          var _this = this,
+            defaults = {
+              lat: _this.gmap.getCenter().lat(),
+              lng: _this.gmap.getCenter().lng(),
+              icono: argenmap.BASEURL + 'img/marcadores/punto.png',
+              nombre: 'Marcador_' + Math.floor(Math.random() * 10100),
+              contenido: undefined
+            };
+          opciones = $.extend({}, defaults, opciones);
+
+
+          //compatibilidad entre lng, lon y long
+          if(opciones.hasOwnProperty("long")) {
+            //long es un reserved de JS, closure no puede manejarlo
+            opciones.lng = opciones['long'];
+          }else if(opciones.hasOwnProperty("lon")) {
+            opciones.lng = opciones.lon;
+          }else if(opciones.hasOwnProperty("lat") && typeof(opciones.lat) === "function"){
+            //el argument es un google.maps.LatLng
+            opciones.lat = opciones.lat();
+            opciones.lng = opciones.lng();
+          }
+
+          var marker = {};
+          marker.icon = opciones.icono;
+          marker.data = opciones.contenido;
+          marker.position = new google.maps.LatLng(opciones.lat, opciones.lng);
+          marker.title = opciones.nombre;
+          //marker.map = _this.gmap;
+
+          var m = new google.maps.Marker(marker);
+
+          this._marcadores[opciones.nombre] = m;
+          if (window.sota !== undefined ) {
+            sota.push(m);
+          } else {
+            sota = [];
+          }
+          _this.markerCluster.addMarker( m, true );
+
+          
+
+          google.maps.event.addListener(m, 'click', function () {
+            if (!opciones.contenido) {
+              return;
+            }
+            _this.infoWindow().open(_this.$el.data('gmap'), m);
+            _this.infoWindow().setContent(opciones.contenido);
+          });
+
+          return;
+        }
         var _marcador = {
           nombre: marcador.titulo,
           icono: marcador.capa,
