@@ -30,7 +30,8 @@
         recurso: "recurso",
         tiporecurso: "tiporecurso",
         zoom: "zoom",
-        descripcion: "descripcion"
+        descripcion: "descripcion",
+        grupo: "grupo"
       },
       barra_class: '.barra',
       barra_titulo_class: '.titulo',
@@ -46,6 +47,7 @@
     this.marcadores = [];
     this.wms = [];
     this.kml = [];
+    this.controlDiv = null;
   }
 
   // Separate functionality from object creation
@@ -132,7 +134,8 @@
           recurso: "gsx$recurso.$t",
           tiporecurso: "gsx$tiporecurso.$t",
           zoom: "gsx$zoom.$t",
-          descripcion: "gsx$descripcion.$t"
+          descripcion: "gsx$descripcion.$t",
+          grupo: "gsx$grupo.$t"
       };
 
       _this.entries = _this._mapFields(true);
@@ -141,39 +144,39 @@
     parsePlainJSON: function(deferred) {
       var _this = this;
 
-      var grupos = _this.entries.groupBy(function(item) {
+      var recursos = _this.entries.groupBy(function(item) {
         return item.tiporecurso;
       });
 
-      _this.wms = grupos.wms;
-      _this.marcadores = grupos.marcador;
-      _this.kml = grupos.kml;
+      _this.wms = recursos.wms;
+      _this.marcadores = recursos.marcador;
+      _this.kml = recursos.kml;
 
-      if (grupos.centro !== undefined) {
-        _this.parseCoordenadas(grupos.centro[0].recurso, function(latlng) {
+      if (recursos.centro !== undefined) {
+        _this.parseCoordenadas(recursos.centro[0].recurso, function(latlng) {
           _this.opts.vistaInicial.lat = latlng.lat;
           _this.opts.vistaInicial.lng = latlng.lng;
 
-          if (grupos.centro[0].zoom !== undefined) {
-            _this.opts.vistaInicial.zoom = grupos.centro[0].zoom;  
+          if (recursos.centro[0].zoom !== undefined) {
+            _this.opts.vistaInicial.zoom = recursos.centro[0].zoom;  
           }
 
-          if (grupos.centro[0].capa === 'satelite' ) {
+          if (recursos.centro[0].capa === 'satelite' ) {
             _this.opts.vistaInicial.capa = 'satellite';  
           }
 
-          if (grupos.centro[0].capa === 'mapaignbyn' ) {
+          if (recursos.centro[0].capa === 'mapaignbyn' ) {
             _this.$el.addClass('argenmapvis_byn');
           }
 
-          if (grupos.centro[0].titulo ) {
+          if (recursos.centro[0].titulo ) {
             $(_this.opts.barra_class).show();
-            $(_this.opts.barra_class + ' ' + _this.opts.barra_titulo_class).html(grupos.centro[0].titulo);
+            $(_this.opts.barra_class + ' ' + _this.opts.barra_titulo_class).html(recursos.centro[0].titulo);
           }          
 
-          if (grupos.centro[0].descripcion ) {
+          if (recursos.centro[0].descripcion ) {
             $(_this.opts.barra_class).show();
-            $(_this.opts.barra_class + ' ' + _this.opts.barra_descripcion_class).html(grupos.centro[0].descripcion);
+            $(_this.opts.barra_class + ' ' + _this.opts.barra_descripcion_class).html(recursos.centro[0].descripcion);
           }          
 
           deferred.resolve();
@@ -194,17 +197,12 @@
       entries = $.map(_this.entries, function(entry, i) {
         var mapped={};
 
-        
         try {
           // Esto puede tirar error
           // si en la spreadsheet no están los encabezados
           mapped = magic_map(entry);
         } catch(e) {
-          var url = 'https://docs.google.com/spreadsheet/pub?key={google_docs_id}&output=html';
-          url = url.replace('{google_docs_id}', _this.opts.source);
-          var msg = "Falta la línea de encabezados en la <a target='blank' href='{url}'>hoja de cálculo</a>";
-          msg = msg.replace('{url}', url);
-          _this.alert(msg);
+
         }
         return mapped;
       }); // fin del $.map
@@ -215,10 +213,22 @@
         $.each(field_map, function(name, real_name) {
           var tmp = entry;
           var partes = real_name.split('.');
-          $(partes).each(function() {
-            tmp = tmp[this];
-          })
-          ret[name] = tmp;
+          try {
+            $(partes).each(function() {
+              tmp = tmp[this];
+            });
+            ret[name] = tmp;
+            
+          } catch(e) {
+            if (name != 'grupo') {
+              var url = 'https://docs.google.com/spreadsheet/pub?key={google_docs_id}&output=html';
+              url = url.replace('{google_docs_id}', _this.opts.source);
+              var msg = "Falta la línea de encabezados en la <a target='blank' href='{url}'>hoja de cálculo</a>";
+              msg = msg.replace('{url}', url);
+              _this.alert(msg);            
+            }
+            //tirar error del try de arriba si faltan encabezados esencials, no como la columna 'grupo' 
+          }
 
         });
         return ret;
@@ -232,6 +242,11 @@
 
       $mapa = _this.$el;
       $mapa.argenmap();
+
+
+      var map = $mapa.data().gmap;
+      
+
       
       if (_this.opts.vistaInicial.zoom !== undefined) {
         $mapa.zoom( parseInt(_this.opts.vistaInicial.zoom) );      
@@ -253,24 +268,22 @@
         });
       });
 
-      $(_this.marcadores).each(function(k, marcador) {
-        _this.parseCoordenadas(marcador.recurso, function(latlng) {
-          if (! latlng.lat ) {
-            return;
-          }
-          var $contenido = $('<div />');
-          $("<h3 />").html(marcador.titulo).appendTo($contenido);
-          $("<div />").html(marcador.descripcion).appendTo($contenido);
+      var marcadores_por_grupo = _this.marcadores.groupBy(function(item) {
+        return item.grupo;
+      });
 
-          $mapa.agregarMarcador({
-            nombre: marcador.titulo,
-            icono: marcador.capa,
-            lat: latlng.lat,
-            lng: latlng.lng,
-            contenido: $contenido.html(),
-          });
-        
-        });
+      if (_this.marcadores &&  marcadores_por_grupo[undefined] === undefined) {
+        this.controlDiv = _this.ControlDeGrupos('Marcadores', marcadores_por_grupo);
+    
+        // Add the control to the map at a designated control position
+        // by pushing it on the position's array. This code will
+        // implicitly add the control to the DOM, through the Map
+        // object. You should not attach the control manually.
+        map.controls[google.maps.ControlPosition.RIGHT_TOP].push(this.controlDiv);
+      }
+
+      $(_this.marcadores).each(function(k, marcador) {
+        _this.agregarMarcador(marcador);
 
       });
       $(_this.kml).each(function(k, kml) {
@@ -279,6 +292,111 @@
           url: 'http://mapa.ign.gob.ar/mapa/proxy/?url=' + encodeURIComponent(kml.recurso)
         });
       })
+    },
+
+    agregarMarcador: function(marcador) {
+      var _this = this;
+      _this.parseCoordenadas(marcador.recurso, function(latlng) {
+        if (! latlng.lat ) {
+          return;
+        }
+        var $contenido = $('<div />');
+        $("<h3 />").html(marcador.titulo).appendTo($contenido);
+        $("<div />").html(marcador.descripcion).appendTo($contenido);
+
+        $mapa.agregarMarcador({
+          nombre: marcador.titulo,
+          icono: marcador.capa,
+          lat: latlng.lat,
+          lng: latlng.lng,
+          contenido: $contenido.html(),
+        });
+      
+      });
+    },
+    /**
+     * The HomeControl adds a control to the map that simply
+     * returns the user to Chicago. This constructor takes
+     * the control DIV as an argument.
+     */
+    ControlDeGrupos: function (titulo, marcadores_por_grupo) {
+      var _this = this;
+      var grupos = [];
+      for (x in marcadores_por_grupo) {
+        grupos.push(x)
+      }
+      var controlDiv = document.createElement('div');
+      // We don't really need to set an index value here, but
+      // this would be how you do it. Note that we set this
+      // value as a property of the DIV itself.
+      controlDiv.index = 1;
+      
+      // Set CSS styles for the DIV containing the control
+      // Setting padding to 5 px will offset the control
+      // from the edge of the map.
+      $(controlDiv).css('padding', '5px');
+
+      // Set CSS for the control border.
+      var $controlUI = $('<div />').css({
+        'padding': '1px 0px',
+        'background-color': 'white',
+        'border': '1px solid rgba(0, 0, 0, 0.14902)',
+        'cursor': 'pointer',
+        'text-align': 'center'
+      })
+      .appendTo( $(controlDiv) );
+
+
+      // Set CSS for the control interior.
+      var $controlText = $('<div />').css({
+        'font-family': 'Arial, sans-serif',
+        'font-size': '12px',
+        'padding-left': '4px',
+        'padding-right': '4px'
+      }).html( titulo )
+      .attr('title', 'Click para ver los grupos de marcadores')
+      .appendTo( $controlUI );
+
+      $('<img src="http://maps.gstatic.com/mapfiles/arrow-down.png" draggable="false" style="position:relative;-webkit-user-select: none; border: 0px; padding: 0px; margin: -2px 0px 0px 10px; right: 6px; top: 50%; width: 7px; height: 4px;">')
+      .appendTo($controlText);
+
+      var $gruposUI = $('<div />').css({
+        'text-align': 'left'
+      });
+
+      $(grupos).each(function() {
+        $gruposUI.append( grupo(this) )
+          .appendTo( $controlUI ).hide();
+      })
+
+      function grupo(nombreDelGrupo) {
+        var $grupoUI = $('<div />');
+        var $input = $('<input checked="checked" type="checkbox"/>');
+        $input.data('grupo', nombreDelGrupo)
+        $input.click(function() {
+          if ( $(this).is(':checked')) {
+            var grupo = $(this).data('grupo');
+            $(marcadores_por_grupo[grupo]).each(function() {
+              _this.agregarMarcador(this);
+            });            
+          } else {
+            var grupo = $(this).data('grupo');
+            $(marcadores_por_grupo[grupo]).each(function() {
+              $mapa.quitarMarcador(this.titulo);
+            });
+          }
+        })
+        $grupoUI.append( $input );
+        $grupoUI.append('<strong>' + nombreDelGrupo + '</strong>');
+        return $grupoUI;
+      }
+
+      // Setup the click event listeners: simply set the map to Chicago.
+      $controlText.click(function() {
+        $gruposUI.toggle();
+
+      });
+      return controlDiv;
     },
 
     alert: function (msg) {
