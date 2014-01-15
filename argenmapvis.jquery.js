@@ -486,10 +486,12 @@
       .appendTo($controlText);
 
       var $gruposUI = $('<div />').css({
-        'text-align': 'left'
+        'text-align': 'left',
+        'max-height': '250px',
+        'overflow': 'auto'                
       });
 
-      $(grupos).each(function() {
+      $(grupos.sort()).each(function() {
         $gruposUI.append( grupo(this) )
           .appendTo( $controlUI ).hide();
       })
