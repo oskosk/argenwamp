@@ -604,7 +604,7 @@
         $option.text(v.nombre);
         $option.val(v.nombre);
         $option.data('vista', v);
-        if (i >= 24 ) {
+        if (i > 24 ) {
           $optgroup.append( $option );
           $vistasUI.append( $optgroup );
         } else {
