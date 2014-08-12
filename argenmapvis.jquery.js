@@ -499,7 +499,7 @@
         marker.position = new google.maps.LatLng(opciones.lat, opciones.lng);
         // El usuario puede poner HTML en la columna de título
         // Lo paso por jQuery.text() para que on hover, el marker no muestre las tags HTML.
-        if ($(opciones.nombre).html()) {
+        if ($(opciones.nombre).text()) {
           marker.title = $(opciones.nombre).text();
         } else {
           marker.title = opciones.nombre;
