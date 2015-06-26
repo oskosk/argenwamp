@@ -577,7 +577,13 @@
           var iframe = "&lt;iframe src='{url_embed}?source={source}&amp;' width='{width}' height='{height}' frameborder='0'&gt;&lt;/iframe&gt;";
           var url_embed = 'http://argenwamp.com.ar/iframe.html';
           if ( google_docs_url) {
+            // Vieja URL de google docs con parametro en laq uery GET key=xxxxx
             id = $.url(google_docs_url).param('key');
+            if (!id) {
+              // probar la nueva url basada en segmentos.
+              // Puede fallar en el futuro
+              id = $.url(google_docs_url).segment(3);              
+            }
           } else {
             id = '0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc';
           }          
