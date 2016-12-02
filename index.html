@@ -188,7 +188,7 @@
             <ul>
               <li>ArgenWamp es altamente disponible porque está hosteado en <a href="http://pages.github.com/" target="_blank">GitHub Pages</a>.</li>
               <li>El código de argenWAMP está en la branch <code>master</code> del repo <a href="http://github.com/oskosk/argenwamp">http://github.com/oskosk/argenwamp</a>.
-              <li>La versión <abbr title="Este sitio en el que estás ahora">live</abbr>, osea el sitio <code>argenwamp.com.ar</code> está en la branch <code>gh-pages</code> del mismo repo y ahí es donde aparece la magia de GitHub y mantiene esa página siempre online por el resto de la eternidad.</li>
+              <li>La versión <abbr title="Este sitio en el que estás ahora">live</abbr>, osea el sitio <code>argenwamp.com</code> está en la branch <code>gh-pages</code> del mismo repo y ahí es donde aparece la magia de GitHub y mantiene esa página siempre online por el resto de la eternidad.</li>
               <li>La estabilidad del mapa depende de la estabilidad de la librería <a target="_blank" href="http://ign.gob.ar/argenmap">argenmap.jquery</a>, que es un servicio WEB del IGN.</li>
 
             </ul>
@@ -362,7 +362,7 @@
                   <label for="embed-code" class="control-label"> <strong>Código para incrustar</strong></label>
                   <div class="controls">
                     <textarea  style="width: 100%; height: 100px; min-height: 110px; max-height: 300px; resize: none; font-family: 'Courier New',monospace;font-size:.8em" id="embed-code">
-&lt;iframe src='http://argenwamp.com.ar/iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc' width='600' height='500' frameborder='0'&gt;&lt;/iframe&gt;</textarea>
+&lt;iframe src='http://argenwamp.com/iframe.html?source=0AqdTbs1TYvZKdFlQVDNBdFVKSFZzci04UE5UYkpmYmc' width='600' height='500' frameborder='0'&gt;&lt;/iframe&gt;</textarea>
                     <p><em>Copiá este código y pegalo en donde quieras que tu mapa aparezca.</em>
                     </p>
                     <hr/>
@@ -575,7 +575,7 @@
 
             //console.log(google_docs_url);
           var iframe = "&lt;iframe src='{url_embed}?source={source}&amp;' width='{width}' height='{height}' frameborder='0'&gt;&lt;/iframe&gt;";
-          var url_embed = 'http://argenwamp.com.ar/iframe.html';
+          var url_embed = 'http://argenwamp.com/iframe.html';
           if ( google_docs_url) {
             // Vieja URL de google docs con parametro en laq uery GET key=xxxxx
             id = $.url(google_docs_url).param('key');
